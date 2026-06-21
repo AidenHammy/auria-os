@@ -1,17 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Landing Page</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>AuriaOS</title>
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Welcome to my OS</h1>
-  <h2>Introduction</h2>
-  <p>Hello world!</p>
-  <img src="./imageOfMe.png" />
-  <a href="https://www.instagram.com/starthackclub/">Instagram</a>
-  <p> <dfn>DFN Tag</dfn> is a tag that marks something being defined</p>
-  <p><abbr title="abbreviation">abbr</abbr> is a tag that marks an abbreviated term</p>
+	<!-- The desktop area where windows live -->
+	<div id="desktop">
+
+		<!-- Desktop icons -->
+		<div class="desktop-icons">
+			<div class="icon" data-app="browser">
+				<div class="icon-image">🌐</div>
+				<span class="icon-label">Browser</span>
+			</div>
+			<div class="icon" data-app="terminal">
+				<div class="icon-image">💻</div>
+				<span class="icon-label">Terminal</span>
+			</div>
+			<div class="icon" data-app="notepad">
+				<div class="icon-image">📝</div>
+				<span class="icon-label">Notes</span>
+			</div>
+			<div class="icon" data-app="apps">
+				<div class="icon-image">🗂️</div>
+				<span class="icon-label">Apps</span>
+			</div>
+			<div class="icon" data-app="settings">
+				<div class="icon-image">⚙️</div>
+				<span class="icon-label">Settings</span>
+			</div>
+		</div>
+
+		<!-- Windows container (initially empty) -->
+		<div id="window-layer"></div>
+
+	</div>
+
+	<!-- Taskbar at the bottom -->
+	<div id="taskbar">
+		<button id="start-btn"></button>
+		<div id="taskbar-apps"></div>
+		<div id="system-tray">
+			<span id="clock">12:00 PM</span>
+		</div>
+	</div>
+
+	<!-- Start Menu (hidden by default) -->
+	<div id="start-menu" class="hidden">
+		<div class="start-header">AuriaOS</div>
+		<div class="start-apps">
+			<div class="start-app" data-app="browser">🌐 Browser</div>
+			<div class="start-app" data-app="terminal">💻 Terminal</div>
+			<div class="start-app" data-app="notepad">📝 Notepad</div>
+			<div class="start-separator"></div>
+			<div class="start-app" data-app="apps">🗂️ Apps</div>
+			<div class="start-app" data-app="settings">⚙️ Settings</div>
+			<div class="start-separator"></div>
+			<div class="start-app" data-action="shutdown">⏻ Shut Down</div>
+		</div>
+	</div>
+
+	<!-- Templates for windows -->
+	<template id="window-template">
+		<div class="window">
+			<div class="window-titlebar">
+				<span class="window-title">App Name</span>
+				<div class="window-controls">
+					<button class="minimize">−</button>
+					<button class="maximize">□</button>
+					<button class="close">×</button>
+				</div>
+			</div>
+			<div class="window-content">
+
+			</div>
+		</div>
+	</template>
+
+	<!-- Apps folder: grid of installed apps -->
+	<template id="app-apps">
+		<div class="apps-folder">
+			<div class="folder-item" data-app="browser">
+				<span class="folder-icon">🌐</span>
+				<span class="folder-label">Browser</span>
+			</div>
+			<div class="folder-item" data-app="terminal">
+				<span class="folder-icon">💻</span>
+				<span class="folder-label">Terminal</span>
+			</div>
+			<div class="folder-item" data-app="notepad">
+				<span class="folder-icon">📝</span>
+				<span class="folder-label">Notepad</span>
+			</div>
+			<div class="folder-item" data-app="calculator">
+				<span class="folder-icon">🧮</span>
+				<span class="folder-label">Calculator</span>
+			</div>
+			<div class="folder-item" data-app="moodlamp">
+				<span class="folder-icon">🔮</span>
+				<span class="folder-label">Mood Lamp</span>
+			</div>
+			<div class="folder-item" data-app="fortune">
+				<span class="folder-icon">🥠</span>
+				<span class="folder-label">Fortune</span>
+			</div>
+		</div>
+	</template>
+
+	<!-- Settings: simple toggles and options -->
+	<template id="app-settings">
+		<div class="settings-app">
+			<div class="settings-section">
+				<h3>Appearance</h3>
+				<div class="setting-row">
+					<label>Dark Mode</label>
+					<button class="toggle" data-setting="darkmode">OFF</button>
+				</div>
+				<div class="setting-row">
+					<label>Accent Color</label>
+					<div class="accent-colors">
+						<button class="accent-btn active" style="background: #4ecdc4" data-accent="#4ecdc4"></button>
+						<button class="accent-btn" style="background: #ff6b6b" data-accent="#ff6b6b"></button>
+						<button class="accent-btn" style="background: #a29bfe" data-accent="#a29bfe"></button>
+						<button class="accent-btn" style="background: #ffeaa7" data-accent="#ffeaa7"></button>
+					</div>
+				</div>
+			</div>
+			<div class="settings-section">
+				<h3>System</h3>
+				<div class="setting-row">
+					<label>Animations</label>
+					<button class="toggle active" data-setting="animations">ON</button>
+				</div>
+				<div class="setting-row">
+					<label>Sounds</label>
+					<button class="toggle" data-setting="sounds">OFF</button>
+				</div>
+			</div>
+			<div class="settings-section">
+				<h3>About</h3>
+				<p>AuriaOS v1.0</p>
+				<p>Built with HTML, CSS and JS</p>
+			</div>
+		</div>
+	</template>
+	<script src="script.js"></script>
 </body>
 </html>
