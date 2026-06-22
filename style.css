@@ -21,7 +21,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', system-ui sans-serif;
+  font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
 html, body{
@@ -126,7 +126,7 @@ html, body{
 @keyframes windowOpen{
   from{
     opacity: 0;
-    transform: scale(0.95) trnaslateY(10px);
+    transform: scale(0.95) translateY(10px);
   }
   to {
     opacity: 1;
@@ -154,7 +154,7 @@ html, body{
   align-items: center;
   justify-content: space-between;
   padding: 0 14px;
-  cursor: grab();
+  cursor: grab;
 }
 
 .window-titlebar:active{

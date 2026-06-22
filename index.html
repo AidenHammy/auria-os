@@ -41,7 +41,7 @@
 
 	<!-- Taskbar at the bottom -->
 	<div id="taskbar">
-		<button id="start-btn"></button>
+		<button id="start-btn">☰ Start</button>
 		<div id="taskbar-apps"></div>
 		<div id="system-tray">
 			<span id="clock">12:00 PM</span>
@@ -74,9 +74,58 @@
 					<button class="close">×</button>
 				</div>
 			</div>
-			<div class="window-content">
+			<div class="window-content"></div>
+		</div>
+	</template>
 
+	<!-- App Content Templates -->
+
+	<!-- Browser -->
+	<template id="content-browser">
+		<div class="browser-app">
+			<div style="padding: 40px; text-align: center; color: var(--text-dim)">
+				🌐 Browser would go here. <br>
+				<input type="text" placeholder="https://..." style="margin-top: 20px; padding: 8px 16px; width: 300px;
+				border-radius: 6px; border: 1px solid var(--border); background: var(--bg-light); color: var(--text)">
 			</div>
+		</div>
+	</template>
+
+	<!-- Terminal -->
+	<template id="content-terminal">
+		<div class="terminal-app">
+			<div style="padding: 20px; font-family: monospace; font-size: 13px; color: #4ecdc4">
+				<span style="color: var(--accent)">user@auriaos</span>:<span style="color: #ffeaa7">~</span>$<span class="term-cursor">_</span>
+			</div>
+		</div>
+	</template>
+
+	<!-- Notepad -->
+	<template id="content-notepad">
+		<div class="notepad-app">
+			<textarea style="width: 100%; height: 100%; background: transparent; border: none; color: var(--text); font-size: 14px;
+			resize: none; outline: none; padding: 4px" placeholder="Start typing..."></textarea>
+		</div>
+	</template>
+
+	<!-- Calculator -->
+	<template id="content-calculator">
+		<div class="calculator-app">
+			<div style="padding: 40px; text-align: center; color: var(--text-dim)">🧮 Calculator app</div>
+		</div>
+	</template>
+
+	<!-- Mood Lamp -->
+	<template id="content-moodlamp">
+		<div class="moodlamp-app">
+			<div style="padding: 40px; text-align: center; color: var(--text-dim)">🔮 Mood Lamp app</div>
+		</div>
+	</template>
+
+	<!-- Fortune -->
+	<template id="content-fortune">
+		<div class="fortune-app">
+			<div style="padding: 40px; text-align: center; color: var(--text-dim)">🥠 Fortune Cookie app</div>
 		</div>
 	</template>
 
@@ -142,7 +191,7 @@
 			</div>
 			<div class="settings-section">
 				<h3>About</h3>
-				<p>AuriaOS v1.0</p>
+				<p>AuriaOS - Made with love</p>
 				<p>Built with HTML, CSS and JS</p>
 			</div>
 		</div>
