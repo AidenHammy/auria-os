@@ -37,6 +37,9 @@
 		<!-- Windows container (initially empty) -->
 		<div id="window-layer"></div>
 
+		<!-- Ghost preview shown while dragging a window to a screen edge -->
+		<div id="snap-preview"></div>
+
 	</div>
 
 	<!-- Taskbar at the bottom -->
@@ -75,6 +78,16 @@
 				</div>
 			</div>
 			<div class="window-content"></div>
+
+			<!-- Resize handles: 4 edges + 4 corner -->
+			<div class="resize-handle resize-n" data-dir="n"></div>
+			<div class="resize-handle resize-s" data-dir="s"></div>
+			<div class="resize-handle resize-e" data-dir="e"></div>
+			<div class="resize-handle resize-w" data-dir="w"></div>
+			<div class="resize-handle resize-ne" data-dir="ne"></div>
+			<div class="resize-handle resize-nw" data-dir="nw"></div>
+			<div class="resize-handle resize-se" data-dir="se"></div>
+			<div class="resize-handle resize-sw" data-dir="sw"></div>
 		</div>
 	</template>
 

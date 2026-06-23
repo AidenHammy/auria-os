@@ -205,6 +205,66 @@ html, body{
   background: var(--window-bg);
 }
 
+/* -- Resize Handles -- */
+/* Thin invisible strips along each edge/corner of the window. */
+
+.resize-handle{
+  position: absolute;
+  z-index: 5;
+}
+
+.resize-n, .resize-s{
+  left: 8px;
+  right: 8px;
+  height: 6px;
+  cursor: ns-resize;
+}
+
+.resize-n{top: 0;}
+
+.resize-s{bottom: 0;}
+
+.resize-e, .resize-w{
+  top: 8px;
+  bottom: 8px;
+  width: 6px;
+  cursor: ew-resize;
+}
+
+.resize-e{right: 0;}
+
+.resize-w{left: 0;}
+
+.resize-ne, .resize-nw, .resize-se, .resize-sw{
+  width: 14px;
+  height: 14px;
+  z-index: 6;
+}
+
+.resize-ne{top: 0; right: 0; cursor: nesw-resize;}
+.resize-nw{top: 0; left: 0; cursor: nwse-resize;}
+.resize-se{bottom: 0; right: 0; cursor: nwse-resize;}
+.resize-sw{bottom: 0; left: 0; cursor: nesw-resize;}
+
+.window.maximized .resize-handle{display: none;}
+
+/* -- Snap Preview -- */
+
+#snap-preview{
+  position: absolute;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease, left 0.12s ease, top 0.12s ease, width 0.12s ease, height 0.12s ease;
+}
+
+#snap-preview.active{
+  opacity: 1;
+}
+
 /* -- Taskbar -- */
 
 #taskbar{
@@ -274,9 +334,9 @@ html, body{
 }
 
 .taskbar-app.active{
-  background: rgba(78, 205, 196, 0.15);
-  border-color: rgba(78, 205, 196, 0.3);
-  box-shadow: 0 0 12px rgba(78, 205, 196, 0.1);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
 #system-tray{
@@ -322,7 +382,7 @@ html, body{
   padding: 20px;
   font-size: 18px;
   font-weight: 700;
-  background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), transparent);
+  background: linear-gradient(135 deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent);
   border-bottom: 1px solid var(--border);
 }
 
@@ -430,7 +490,7 @@ html, body{
 }
 
 .toggle.active{
-  background: rgba(78, 205, 196, 0.2);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
   border-color: var(--accent);
   color: var(--accent);
 }
