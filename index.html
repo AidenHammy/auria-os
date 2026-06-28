@@ -53,16 +53,39 @@
 
 	<!-- Start Menu (hidden by default) -->
 	<div id="start-menu" class="hidden">
-		<div class="start-header">AuriaOS</div>
-		<div class="start-apps">
-			<div class="start-app" data-app="browser">🌐 Browser</div>
-			<div class="start-app" data-app="terminal">💻 Terminal</div>
-			<div class="start-app" data-app="notepad">📝 Notepad</div>
-			<div class="start-separator"></div>
-			<div class="start-app" data-app="apps">🗂️ Apps</div>
-			<div class="start-app" data-app="settings">⚙️ Settings</div>
-			<div class="start-separator"></div>
-			<div class="start-app" data-action="shutdown">⏻ Shut Down</div>
+		<div class="start-greeting">
+			<div class="start-greeting-icon-badge">🌙</div>
+			<div class="start-greeting-text">
+				<div class="start-greeting-title">AuriaOS</div>
+				<div class="start-greeting-sub" id="start-greeting-sub">Good evening.</div>
+			</div>
+			<div class="start-greeting-date" id="start-greeting-date"></div>
+		</div>
+		<div class="start-search">
+			<span class="start-search-icon">🔍</span>
+			<input type="text" id="start-search-input" placeholder="Search apps and settings..." autocomplete="off">
+			<span class="start-search-kbd">/</span>
+		</div>
+		<div class="start-section-header">
+			<span class="start-section-label">Pinned</span>
+			<span class="start-section-link" id="start-show-all" tabindex="0" role="button">Show all ›</span>
+		</div>
+		<div class="start-grid"></div>
+		<div class="start-section-label">Recent</div>
+		<div class="start-recent-list"></div>
+		<div class="start-toggles"></div>
+		<div class="start-profile">
+			<div class="start-profile-avatar">🙂</div>
+			<div class="start-profile-text">
+				<div class="start-profile-name" id="start-profile-name">Aiden</div>
+				<div class="start-profile-status"><span class="status dot"></span>Online</div>
+			</div>
+		</div>
+		<div class="start-footer">
+			<div class="start-app-row" data-action="shutdown" tabindex="0" role="button">
+				<span class="start-list-icon">⏻</span>
+				<span class="start-list-label">Shut Down</span>
+			</div>
 		</div>
 	</div>
 

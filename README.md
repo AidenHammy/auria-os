@@ -1,57 +1,102 @@
 # AuriaOS
 
-A browser-based webOS, built from scratch with vanilla HTML, CSS and JavaScript! No frameworks, no build step, just a desktop in a browser tab.
+A browser-based webOS built from scratch with vanilla HTML, CSS and JavaScript. No frameworks, no build step, just a desktop in a browser tab!
 
-This is a personal learning project, built as part of an event, namely Stardance hosted by HackClub.
+This is a personal learning project built as part of **Stardance**, hosted by Hack Club.
 
 ## Why AuriaOS?
 
-This project is an experiment in understanding how operating system-like behavior works at a UI level—window management, state handling and interactions without relying on abstractions.
+AuriaOS is an experiment in understanding how desktop operating systems behave at the UI level; window management, state persistence, multitasking, keyboard interactions and desktop workflows. All without relying on frameworks or abstractions.
 
-The goal isn’t to build something that works but to understand why it works.
+The goal isn't just to build something that works but to understand *why* it works.
 
 ## Features
 
-**Window Manager**
-- Open, close, minimize, and maximize windows
-- Drag windows anywhere on the desktop, with bounds clamping so they can't get lost off-screen
-- Resize from any edge or corner
-- Edge snapping (drag to a screen edge to snap to half-screen, drag to the top to maximize) with a live ghost preview while dragging
-- Double-click a titlebar to maximize/restore
+### Window Manager
+- Open, close, minimize and maximize windows
+- Drag windows freely around the desktop
+- Bounds clamping prevents windows from being dragged fully off-screen
+- Resize windows from every edge and corner
+- Edge snapping with a live ghost preview
+  - Snap left/right for a split view
+  - Drag to the top to maximize
+- Double-click a titlebar to maximize or restore
+- Proper window focus and z-index management
 
-**Desktop & Taskbar**
-- Desktop icons, double-click to launch
-- Start menu for launching apps
-- Taskbar buttons that reflect each window's live state (active/minimized)
-- Click taskbar buttons to focus or minimize windows
+### Desktop
+- Desktop icons with double-click launching
+- Live desktop clock
+- Window state synchronized with the taskbar
 
-**Settings**
+### Start Menu
+- Search across the full app catalog instantly not just pinned apps
+- Pin/unpin apps via right-click with a real context menu
+- Five core apps are locked as always-pinned so the menu can never end up empty
+- Pinned apps grid with a colored icon badge for every app
+- Recent section; tracking apps you've actually opened (real activity not placeholder data)
+- "Show all" link straight into the Apps folder
+- Quick toggles for Dark Mode, Sound, Wi-Fi and Bluetooth; Dark Mode and Sound are real saved settings shared with the Settings panel; Wi-Fi/Bluetooth are visual only since a browser tab has no actual hardware to control
+- Personal greeting header with a time-aware message and the current date
+- User profile footer
+- Full keyboard support! Tab between items, Enter or Space to activate, Escape to close, Enter in search opens the top result
+- "/" keyboard shortcut jumps straight into search from anywhere
+
+### Taskbar
+- Live taskbar buttons for every open window
+- Active/minimized state indicators
+- Click a taskbar button to focus or minimize its window
+- System tray icons mirror current Wi-Fi and Sound state
+
+### Settings
 - Dark mode toggle
-- Live accent color theming (affects the taskbar, start menu, and settings UI, not just a CSS variable that does nothing)
-- Animations/sounds toggles
+- Live accent color theming reflected across the taskbar, start menu and settings UI
+- Animations toggle
+- Sound toggle (a saved preference for now, no audio is wired up yet)
+- All preferences persist automatically via `localStorage`
 
-**Apps**
-- **Notepad** — basic placeholder (functionality expanding)
-- **Browser, Terminal, Calculator, Mood Lamp, Fortune Cookie** — currently placeholder shells, real functionality in progress
+## Persistence
+
+Using `localStorage`, AuriaOS remembers:
+- Theme & settings
+- Accent color
+- Notepad contents
+- Pinned applications
+- Recently opened applications
+
+## Apps
+
+**Working**
+- Notepad autosaves while typing persists via `localStorage`
+
+**In Progress**
+- Browser
+- Terminal
+- Calculator
+- Mood Lamp
+- Fortune Cookie
 
 ## Tech Stack
 
-Plain HTML, CSS and JavaScript. No frameworks, no dependencies, no build tools required.
+- HTML
+- CSS
+- Vanilla JavaScript
+- LocalStorage API
 
-## Running Locally
+No frameworks. No libraries. No dependencies. No build tools.
 
-Since there's no build step, you can just open `index.html` directly in a browser. If you'd rather serve it (recommended, some browsers restrict certain APIs on `file://` URLs):
+## Roadmap
 
-```bash
-# Python
-python3 -m http.server
-
-# or Node
-npx serve
-```
-
-Then visit `http://localhost:8000` (or whatever port your server reports).
+Planned additions include:
+- A fully functional Terminal
+- Browser with real navigation support
+- Calculator implementation
+- More desktop applications
+- A simulated file system
+- Notifications
+- Broader keyboard accessibility beyond the start menu
+- More keyboard shortcuts
+- Performance improvements
 
 ## Contributing
 
-This is primarily a learning project but feedback, ideas and issues are always welcome!
+This is primarily a learning project but feedback, suggestions and bug reports are always welcome!

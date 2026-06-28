@@ -351,13 +351,16 @@ html, body{
   color: var(--text-dim);
 }
 
+.tray-icon{font-size: 13px;}
+
 /* -- Start Menu -- */
 
 #start-menu{
   position: fixed;
   bottom: 56px;
   left: 16px;
-  width: 280px;
+  width: 380px;
+  max-height: min(640px, calc(100vh - 88px));
   background: var(--taskbar-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -365,7 +368,8 @@ html, body{
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   z-index: 101;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   animation: menuOpen 0.2s ease;
 }
 
@@ -378,41 +382,325 @@ html, body{
   display: none;
 }
 
-.start-header{
-  padding: 20px;
-  font-size: 18px;
-  font-weight: 700;
-  background: linear-gradient(135 deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent);
+/* Greeting header: icon, name + time-aware greeting and date on the right*/
+.start-greeting{
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 18px 14px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent);
   border-bottom: 1px solid var(--border);
 }
 
-.start-apps{
-  padding: 8px;
+.start-greeting-icon-badge{
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5b6fd8, #8b5cf6);
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.start-greeting-text{flex: 1;}
+
+.start-greeting-title{font-size: 16px; font-weight: 700; color: var(--text);}
+
+.start-greeting-sub{font-size: 12px; color: var(--text-dim); margin-top: 2px;}
+
+.start-greeting-date{
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: right;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* Search bar with a kbd-style "/" hint matching the global shortcut */
+.start-search{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 16px 4px;
+  padding: 9px 10px 9px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+.start-search-icon{font-size: 13px; color: var(--text-dim);}
+
+.start-search input{
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.start-search input::placeholder{color: var(--text-dim);}
+
+.start-search-kbd{
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* Section headers ("Pinned" gets a "Show all" link, "Recent" doesn't) */
+.start-section-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 6px;
+}
+
+.start-section-label{
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  padding: 14px 16px 6px;
+}
+
+.start-section-header .start-section-label{padding: 0;}
+
+.start-section-link{
+  font-size: 11px;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.start-section-link:hover{text-decoration: underline;}
+
+/* Pinned app tiles, 4 across each icon sitting in its own coloured badge */
+.start-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 4px 14px 14px;
 }
 
 .start-app{
-  padding: 10px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 4px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
   transition: var(--transition);
 }
 
 .start-app:hover{
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+  transform: translateY(-2px);
 }
 
-.start-separator{
-  height: 1px;
-  background: var(--border);
-  margin: 6px 0;
+.start-app:active{transform: translateY(0) scale(0.96);}
+
+/* The badge colour comes from each app's `badge` property set inline via JS */
+.start-app-icon-badge{
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
+
+.start-app-label{font-size: 11px; color: var(--text); text-align: center;}
+
+.start-grid-empty{
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 16px;
+}
+
+/* Staggering each tile in slightly after the last so the grid cascades
+   into view instead of all popping in at once */
+
+.start-grid .start-app{opacity: 0; animation: tileIn 0.25s ease forwards;}
+.start-grid .start-app:nth-child(1){animation-delay: 0.02s;}
+.start-grid .start-app:nth-child(2){animation-delay: 0.05s;}
+.start-grid .start-app:nth-child(3){animation-delay: 0.08s;}
+.start-grid .start-app:nth-child(4){animation-delay: 0.11s;}
+.start-grid .start-app:nth-child(5){animation-delay: 0.14s;}
+.start-grid .start-app:nth-child(6){animation-delay: 0.17s;}
+.start-grid .start-app:nth-child(7){animation-delay: 0.20s;}
+.start-grid .start-app:nth-child(8){animation-delay: 0.23s;}
+
+@keyframes tileIn{
+  from {opacity: 0; transform: translateY(6px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+/* Recent -> Apps that have actually been opened with a real timestamp */
+.start-recent-list{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 10px 8px;
+}
+
+.start-recent-item{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.start-recent-item:hover{background: rgba(255, 255, 255, 0.05);}
+
+.start-recent-icon-badge{
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.start-recent-text{flex: 1; min-width: 0;}
+
+.start-recent-title{
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.start-recent-sub{font-size: 10px; color: var(--text-dim);}
+
+.start-recent-time{font-size: 11px; color: var(--text-dim); white-space: nowrap;}
+
+.start-recent-empty{padding: 6px 16px 14px; text-align: center; font-size: 12px; color: var(--text-dim);}
+
+/* Quick toggles -> Dark mode and Sound are real settings shared with the Settings panel
+   Wifi/Bluetooth are cosmetic only, no real hardware to control from a browser tab */
+
+.start-toggles{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.start-toggle{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.start-toggle:hover{background: rgba(255, 255, 255, 0.07);}
+
+.start-toggle.active{
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.start-toggle-icon{font-size: 15px;}
+
+.start-toggle-label{font-size: 11px; color: var(--text); font-weight: 500;}
+
+.start-toggle-sub{font-size: 10px; color: var(--text-dim);}
+
+/* User profile row */
+.start-profile{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.start-profile-avatar{
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f6b73c, #f87c56);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.start-profile-name{font-size: 13px; font-weight: 500; color: var(--text);}
+
+.start-profile-status{
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-dot{
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2ecc71;
+  display: inline-block;
+}
+
+/* Footer (Shut Down) sits below as its own row, not part of the grid
+   since it's a system action not a pinned app */
+.start-footer{padding: 8px; border-top: 1px solid var(--border)}
+
+.start-app-row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.start-app-row:hover{background: rgba(255, 255, 255, 0.06);}
+
+.start-list-icon{font-size: 16px;}
+.start-list-label{font-size: 13px; color: var(--text);}
+
+/* Keyboard focus states -> every interactive element in the start menu is a plain <div> with a click handler
+   so without this, tab focusing one shows no visible indicator at all, :focus-visible only shows the ring 
+   for keyboard focus not mouse clicks so it doesn't add a visual outline every time it's clicked */
+
+.start-app:focus-visible,
+.start-recent-item:focus-visible,
+.start-toggle:focus-visible,
+.start-app-row:focus-visible,
+.start-section-link:focus-visible{outline: 2px solid var(--accent); outline-offset: 2px;}
 
 /* -- Apps Folder -- */
 
@@ -543,8 +831,56 @@ html, body{
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* -- Context Menu -- */
+.context-menu{
+  position: fixed;
+  min-width: 180px;
+  background: var(--taskbar-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 6px;
+  z-index: 200;
+  animation: menuOpen 0.12s ease;
+}
+
+.context-menu-item{
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text);
+  transition: var(--transition);
+}
+
+.context-menu-item:hover{
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.context-menu-item.disabled{
+  color: var(--text-dim);
+  cursor: default;
+  opacity: 0.6;
+}
+
+.context-menu-item.disabled:hover{
+  background: none;
+}
+
 /* -- Utility -- */
 
 .hidden{
   display: none !important;
+}
+
+/* The animations toggle in settings adds this class to <html>
+   it overrides every animation and transition in one place
+   instead of conditionally applying each one in JS. */
+
+.no-animations *, .no-animations *::before, .no-animations *::after{
+  animation-duration: 0.001s !important;
+  animation-delay: 0s !important;
+  transition: none !important;
 }
