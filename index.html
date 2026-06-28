@@ -130,8 +130,10 @@
 	<!-- Terminal -->
 	<template id="content-terminal">
 		<div class="terminal-app">
-			<div style="padding: 20px; font-family: monospace; font-size: 13px; color: #4ecdc4">
-				<span style="color: var(--accent)">user@auriaos</span>:<span style="color: #ffeaa7">~</span>$<span class="term-cursor">_</span>
+			<div class="terminal-output"></div>
+			<div class="terminal-input-row">
+				<span class="terminal-prompt-inline">user@auriaos:~$</span>
+				<input type="text" class="terminal-input" autocomplete="off" spellcheck="false">
 			</div>
 		</div>
 	</template>

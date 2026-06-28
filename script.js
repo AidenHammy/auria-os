@@ -360,6 +360,7 @@ function openWindow(appKey){
   if(appKey === "apps") wireAppsFolder(contentArea);
   if(appKey === "settings") wireSettings(contentArea);
   if(appKey === "notepad") wireNotepad(contentArea);
+  if(appKey === "terminal") wireTerminal(contentArea);
 }
 
 function closeWindow(id){
@@ -827,13 +828,25 @@ buildRecentList();
 buildQuickToggles();
 
 // Shutdown
-document.querySelector('[data-action="shutdown"]')?.addEventListener("click", () => {
-    startMenu.classList.add("hidden");
-    document.body.innerHTML =
-      `<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #000; color: #fff;
-        font-size: 24px">Shutting down...</div>`;
-    setTimeout(() => location.reload(), 5000);
-  });
+// Pulled into its own function so the terminal's `shutdown` command can
+// trigger the exact same behaviour instead of duplicating it
+function shutdownOS(){
+  startMenu.classList.add("hidden");
+  document.body.innerHTML = 
+  `<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #000; color: #fff;
+   font-size: 24px">Shutting down...</div>`;
+  
+  setTimeout(() => location.reload(), 5000);
+}
+
+document.querySelector('[data-action="shutdown"]')?.addEventListener("keydown", (e) => {
+  if(e.key === "Enter" || e.key === " "){
+    e.preventDefault();
+    e.target.closest('[data-action="shutdown"]').click();
+  }
+});
+
+document.querySelector('[data-action="shutdown"]')?.addEventListener("click", shutdownOS);
 
 // ----- Apps Folder Wiring -----------------
 function wireAppsFolder(container){
@@ -882,6 +895,7 @@ function wireSettings(container){
       if(setting === "animations"){
         document.documentElement.classList.toggle("no-animations", !isActive);
       }
+      syncQuickToggles();
     });
   });
 
@@ -932,6 +946,236 @@ function wireNotepad(container){
       console.warn("Couldn't save notes.", err);
     }
   });
+}
+
+// ------------ Terminal -------------------
+// A real shell. Commands like opening apps, pinnning/unpinning, changing
+// settings actually work. Shared logic lives here in TERMINAL_COMMANDS
+// Each open terminal window gets its own output log and command history via
+// the closure variables set up in wireTerminal() below
+
+// Shared by every on/off-style setting command (darkmode, sound, wifi, bluetooth)
+// so the validation/apply/sync logic only exists once
+function toggleBooleanSetting(key, arg){
+  if(arg !== "on" && arg!== "off") return `Usage: ${key} <on/off>`;
+  state.settings[key] = arg === "on";
+  saveSettings();
+  if(key === "darkmode") applySettings(); // real visual effect
+  syncQuickToggles();
+  syncOpenSettingsPanels();
+  return `${key} turned ${arg}`;
+}
+
+const TERMINAL_COMMANDS = {
+  help(){
+    return [
+      "Available commands:",
+      "  help                 show this list",
+      "  clear                clear the screen",
+      "  date                 show the current date and time",
+      "  whoami               show the current user",
+      "  echo <text>          print text back",
+      "  ls                   list installed apps",
+      "  open <app>           launch an app by name",
+      "  pin <app>            pin an app to the start menu",
+      "  unpin <app>          unpin an app from the start menu",
+      "  theme <#hex>         change the accent color",
+      "  darkmode <on/off>    toggle dark mode",
+      "  sound <on/off>       toggle the sound settings",
+      "  wifi <on/off>        toggle wifi (cosmetic)",
+      "  bluetooth <on/off>   toggle bluetooth (cosmetic)",
+      "  history              show command history",
+      "  closeall             close every open window",
+      "  shutdown             shut down AuriaOS"
+    ];
+  },
+
+  // `clear` is handled as a special return value rather than touching the
+  // DOM directly. wireTerminal() owns all the actual rendering
+
+  clear(){
+    return{clear: true}
+  },
+
+  date(){
+    return new Date().toString();
+  },
+
+  whoami(){
+    return USER_NAME;
+  },
+
+  echo(args){
+    return args.join(" ") || "";
+  },
+
+  ls(){
+    return Object.entries(apps).map(([key, app]) => `${app.icon}  ${key.padEnd(12)} ${app.title}`);
+  },
+
+  open(args){
+    const key = args[0];
+    if(!key) return "Usage: open <app>";
+    if(!apps[key]) return `open: app not found: ${key}`;
+    openWindow(key);
+    return `Opening ${apps[key].title}...`; 
+  },
+
+  pin(args){
+    const key = args[0];
+    if(!key) return "Usage: pin <app>";
+    if(!apps[key]) return `pin: app not found ${key}`;
+    if(apps[key].locked) return `${apps[key].title} is already always pinned.`;
+    if(state.pinnedApps.has(key)) return `${apps[key].title} is already pinned.`;
+    togglePinned(key);
+    return `Pinned ${apps[key].title}.`;
+  },
+
+  unpin(args){
+    const key = args[0];
+    if(!key) return "Usage unpin <app>";
+    if(!apps[key]) return `unpin: app not found: ${key}`;
+    if(apps[key].locked) return `${apps[key].title} can't be unpinned, it's a default app.`;
+    if(!state.pinnedApps.has(key)) return `${apps[key].title} isn't pinned.`;
+    togglePinned(key);
+    return `Unpinned ${apps[key].title}.`;
+  },
+
+  theme(args){
+    const color = args[0];
+    if(!color || !/^#[0-9a-fA-F]{3,8}$/.test(color)) return "Usage: theme <#hexcolor>";
+    state.settings.accent = color;
+    saveSettings();
+    document.documentElement.style.setProperty("--accent", color);
+    document.documentElement.style.setProperty("--accent-hover", color);
+    return `Accent color set to ${color}.`;
+  },
+
+  darkmode(args){
+    return toggleBooleanSetting("darkmode", args[0]);
+  },
+
+  sound(args){
+    return toggleBooleanSetting("sounds", args[0]);
+  },
+
+  wifi(args){
+    return toggleBooleanSetting("wifi", args[0]);
+  },
+
+  bluetooth(args){
+    return toggleBooleanSetting("bluetooth", args[0]);
+  },
+
+  closeall(){
+    const ids = [...state.windows.keys()];
+    ids.forEach((id) => closeWindow(id));
+    return `Closed ${ids.length} window(s).`;
+  },
+  
+  shutdown(){
+    shutdownOS();
+    return "Shutting down...";
+  }
+};
+
+function wireTerminal(container){
+  const output = container.querySelector(".terminal-output");
+  const input = container.querySelector(".terminal-input");
+  if(!output || !input) return;
+
+  // Per-instance meaning if you open two terminal windows
+  // each gets its own history
+
+  const history = [];
+  let historyIndex = -1;
+
+  function printLine(text, className=""){
+    const line = document.createElement("div");
+    line.className = "terminal-line" + (className ? " " + className : "");
+    line.textContent = text;
+    output.appendChild(line);
+  }
+
+  function printCommandLine(command){
+    const line = document.createElement("div");
+    line.className = "terminal-line command";
+    line.innerHTML = `<span class="terminal-prompt-inline">user@auriaos:~$</span>${command}`;
+    output.appendChild(line);
+  }
+
+  function scrollToBottom(){
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function runCommand(raw){
+    const trimmed = raw.trim();
+    if(!trimmed) return;
+
+    printCommandLine(trimmed);
+    history.push(trimmed);
+    historyIndex = history.length;
+
+    const [cmdRaw, ...args] = trimmed.split(/\s+/);
+    const cmd = cmdRaw.toLowerCase();
+
+    // `history` needs the closure-scoped array above so
+    // it's handled here directly instead of living in the shared
+    // TERMINAL_COMMANDS map
+    
+    if(cmd === "history"){
+      if(history.length === 0) printLine("No commands yet.");
+      else history.forEach((h, i) => printLine(`${i + 1}  ${h}`));
+      scrollToBottom();
+      return;
+    }
+
+    const handler = TERMINAL_COMMANDS[cmd];
+    if(!handler){
+      printLine(`command not found: ${cmd}`, "error");
+      scrollToBottom();
+      return;
+    }
+
+    const result = handler(args);
+    if(result && result.clear){
+      output.innerHTML = "";
+      return;
+    }
+    if(Array.isArray(result)) result.forEach((line) => printLine(line));
+    else if(result) printLine(String(result));
+
+    scrollToBottom();
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if(e.key === "Enter"){
+      runCommand(input.value);
+      input.value = "";
+    }
+    else if(e.key === "ArrowUp"){
+      e.preventDefault();
+      if(history.length === 0) return;
+      historyIndex = Math.max(0, historyIndex - 1);
+      input.value = history[historyIndex] || "";
+    }
+    else if(e.key === "ArrowDown"){
+      e.preventDefault();
+      if(history.length === 0) return;
+      historyIndex = Math.min(history.length, historyIndex + 1);
+      input.value = history[historyIndex] || "";
+    }
+  });
+
+  // CLicking anywhere in the terminal refocuses the input but only if
+  // you're not in the middle of selecting text so copying past output
+  // still works normally!
+  container.addEventListener("click", () => {
+    if(window.getSelection().toString() === "") input.focus();
+  });
+
+  printLine("AuriaOS Terminal — type 'help' to see available commands.");
+  input.focus();
 }
 
 // -------- Context Menu ---------------

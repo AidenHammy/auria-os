@@ -4,12 +4,6 @@ A browser-based webOS built from scratch with vanilla HTML, CSS and JavaScript. 
 
 This is a personal learning project built as part of **Stardance**, hosted by Hack Club.
 
-## Why AuriaOS?
-
-AuriaOS is an experiment in understanding how desktop operating systems behave at the UI level; window management, state persistence, multitasking, keyboard interactions and desktop workflows. All without relying on frameworks or abstractions.
-
-The goal isn't just to build something that works but to understand *why* it works.
-
 ## Features
 
 ### Window Manager
@@ -66,11 +60,11 @@ Using `localStorage`, AuriaOS remembers:
 ## Apps
 
 **Working**
-- Notepad autosaves while typing persists via `localStorage`
+- Notepad autosaves while typing, persists via `localStorage`
+- Terminal is a real shell; command parsing, arrow-key history and commands that actually control the OS, not just printed text. `open`, `pin`/`unpin`, `theme`, `darkmode`, `sound`, `wifi`, `bluetooth`, `ls`, `history`, `closeall` and `shutdown` all do exactly what they say
 
 **In Progress**
 - Browser
-- Terminal
 - Calculator
 - Mood Lamp
 - Fortune Cookie
@@ -87,12 +81,12 @@ No frameworks. No libraries. No dependencies. No build tools.
 ## Roadmap
 
 Planned additions include:
-- A fully functional Terminal
 - Browser with real navigation support
 - Calculator implementation
 - More desktop applications
 - A simulated file system
 - Notifications
+- Persisting terminal command history across reloads, not just per-window
 - Broader keyboard accessibility beyond the start menu
 - More keyboard shortcuts
 - Performance improvements
