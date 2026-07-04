@@ -261,7 +261,7 @@ html, body{
   z-index: 5;
 }
 
-.resize-n .resize-s{
+.resize-n, .resize-s{
   left: 8px;
   right: 8px;
   height: 6px;
@@ -276,7 +276,7 @@ html, body{
   bottom: 0;
 }
 
-.resize-e .resize-w{
+.resize-e, .resize-w{
   top: 8px;
   bottom: 8px;
   width: 6px;
