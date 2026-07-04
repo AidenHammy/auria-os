@@ -1,27 +1,35 @@
-/* -- CSS Variables -- */
-
 :root{
-  --bg: #0f0f23;
-  --bg-light: #1a1a2e;
-  --bg-lighter: #252542;
-  --text: #e0e0ff;
-  --text-dim: #8888aa;
-  --accent: #4ecdc4;
-  --accent-hover: #3dbdb4;
-  --danger: #ff6b6b;
-  --window-bg: #16162a;
-  --taskbar-bg: rgba(20, 20, 40, 0.85);
-  --border: rgba(255, 255, 255, 0.08);
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --radius: 10px;
-  --transition: 0.2s ease;
+  --bg: #17140f;
+  --bg-light: #221d15;
+  --bg-lighter: #2c2519;
+  --paper: #ede4d0;
+  --text: #ece4d2;
+  --text-dim: #9a8f79;
+  --accent: #d1893f;
+  --accent-hover: #b8752f;
+  --danger: #b8503f;
+  --ok: #7a9b5c;
+  --window-bg: #1c1810;
+  --taskbar-bg: #1a160f;
+  --border: rgba(236, 228, 210, 0.10);
+  --border-strong: rgba(236, 229, 211, 0.20);
+  --radius-sm: 2px;
+  --radius: 3px;
+  --radius-lg: 5px;
+  --shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+  --shadow-sm: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  --transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', ui-monospace, monospace;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
 *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font-mono);
 }
 
 html, body{
@@ -31,20 +39,33 @@ html, body{
   background: var(--bg);
   color: var(--text);
   user-select: none;
+  font-family: var(--font-body);
 }
 
-/* -- Desktop -- */
+::selection{
+  background: var(--accent);
+  color: #1c1810;
+}
 
 #desktop{
+  position: relative;
+  overflow: hidden;
   width: 100%;
   height: 100%;
-  position: relative;
-  background: radial-gradient(ellipse at 20% 20%, rgba(78, 205, 196, 0.08) 0%, transparent 50%),
-              radial-gradient(ellipse at 80% 80%, rgba(162, 155, 254, 0.06) 0%, transparent 50%),
-              var(--bg);
+
+  background: radial-gradient(ellipse 120% 90% at 50% -10%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.35) 100%), var(--bg);
 }
 
-/* -- Desktop Icons -- */
+#desktop::before{
+  content: "";
+  
+  position: absolute;
+  inset: 0;
+  background: url("./assets/noise.svg") repeat;
+  opacity: 1;
+
+  pointer-events: none;
+}
 
 .desktop-icons{
   position: absolute;
@@ -52,46 +73,46 @@ html, body{
   left: 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 11px;
   z-index: 1;
 }
 
 .icon{
   width: 80px;
   padding: 10px 4px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   cursor: pointer;
   transition: var(--transition);
-  border: 1px solid transparent;
+  border: 1px dashed transparent;
 }
 
 .icon:hover{
-  background: rgba(255, 255, 255, 0.06);
-  border-color: var(--border);
-  transform: translateY(-2px);
+  background: rgba(236, 228, 210, 0.05);
+  border-color: var(--border-strong);
 }
 
 .icon:active{
-  transform: translateY(0) scale(0.96);
+  transform: scale(0.96);
+  background: rgba(209, 137, 63, 0.10);
 }
 
 .icon-image{
-  font-size: 32px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  font-size: 30px;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.3));
 }
 
 .icon-label{
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   text-align: center;
   color: var(--text);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
-
-/* -- Window Layer -- */
 
 #window-layer{
   position: absolute;
@@ -107,28 +128,27 @@ html, body{
   pointer-events: auto;
 }
 
-/* -- Windows -- */
-
 .window{
   position: absolute;
   width: 600px;
   height: 400px;
   background: var(--window-bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: windowOpen 0.25s ease;
+  animation: windowOpen 0.18s ease;
 }
 
 @keyframes windowOpen{
   from{
     opacity: 0;
-    transform: scale(0.95) translateY(10px);
+    transform: scale(0.98) translateY(6px);
   }
-  to {
+
+  to{
     opacity: 1;
     transform: scale(1) translateY(0);
   }
@@ -144,16 +164,17 @@ html, body{
   top: 0 !important;
   left: 0 !important;
   border-radius: 0;
+  box-shadow: none;
 }
 
 .window-titlebar{
-  height: 40px;
-  background: linear-gradient(to bottom, var(--bg-lighter), var(--bg-light));
-  border-bottom: 1px solid var(--border);
+  height: 38px;
+  background: var(--bg-lighter);
+  border-bottom: 1px solid var(--border-strong);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 14px;
+  padding: 0 6px 0 14px;
   cursor: grab;
 }
 
@@ -162,7 +183,7 @@ html, body{
 }
 
 .window-title{
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text);
   display: flex;
@@ -170,32 +191,61 @@ html, body{
   gap: 8px;
 }
 
-.window-controls{
-  display: flex;
-  gap: 8px;
-}
-
-.window-controls button{
-  width: 14px;
-  height: 14px;
+.window-title::before{
+  content: "A";
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
   border-radius: 50%;
-  border: none;
-  cursor: pointer;
+  background: var(--accent);
+  color: #1c1810;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 700;
   font-size: 10px;
+  text-transform: none;
+  letter-spacing: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(0, 0, 0, 0.6);
+}
+
+.window-controls{
+  display: flex;
+  gap: 5px;
+}
+
+.window-controls button{
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
   transition: var(--transition);
 }
 
-.window-controls .minimize {background: #f1c40f;}
-.window-controls .maximize {background: #2ecc71;}
-.window-controls .close {background: var(--danger);}
+.window-controls .minimize:hover{
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
-.window-controls button:hover{
-  filter: brightness(1.2);
-  transform: scale(1.15);
+.window-controls .maximize:hover{
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.window-controls .close:hover{
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--window-bg);
 }
 
 .window-content{
@@ -203,37 +253,43 @@ html, body{
   overflow: auto;
   padding: 16px;
   background: var(--window-bg);
+  font-family: var(--font-body);
 }
-
-/* -- Resize Handles -- */
-/* Thin invisible strips along each edge/corner of the window. */
 
 .resize-handle{
   position: absolute;
   z-index: 5;
 }
 
-.resize-n, .resize-s{
+.resize-n .resize-s{
   left: 8px;
   right: 8px;
   height: 6px;
   cursor: ns-resize;
 }
 
-.resize-n{top: 0;}
+.resize-n{
+  top: 0;
+}
 
-.resize-s{bottom: 0;}
+.resize-s{
+  bottom: 0;
+}
 
-.resize-e, .resize-w{
+.resize-e .resize-w{
   top: 8px;
   bottom: 8px;
   width: 6px;
   cursor: ew-resize;
 }
 
-.resize-e{right: 0;}
+.resize-e{
+  right: 0;
+}
 
-.resize-w{left: 0;}
+.resize-w{
+  left: 0;
+}
 
 .resize-ne, .resize-nw, .resize-se, .resize-sw{
   width: 14px;
@@ -241,19 +297,38 @@ html, body{
   z-index: 6;
 }
 
-.resize-ne{top: 0; right: 0; cursor: nesw-resize;}
-.resize-nw{top: 0; left: 0; cursor: nwse-resize;}
-.resize-se{bottom: 0; right: 0; cursor: nwse-resize;}
-.resize-sw{bottom: 0; left: 0; cursor: nesw-resize;}
+.resize-ne{
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
 
-.window.maximized .resize-handle{display: none;}
+.resize-nw{
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
 
-/* -- Snap Preview -- */
+.resize-se{
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+}
+
+.resize-sw{
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+}
+
+.window.maximized .resize-handle{
+  display: none;
+}
 
 #snap-preview{
   position: absolute;
-  background: color-mix(in srgb, var(--accent) 16%, transparent);
-  border: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border: 2px dashed var(--accent);
   border-radius: var(--radius);
   z-index: 999;
   opacity: 0;
@@ -265,17 +340,13 @@ html, body{
   opacity: 1;
 }
 
-/* -- Taskbar -- */
-
 #taskbar{
   position: fixed;
-  bottom: 0;
-  left: 0;
+  bottom: 0; left: 0;
   width: 100%;
   height: 48px;
   background: var(--taskbar-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  box-shadow: inset 0 1px 0 var(--border-strong);
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -285,13 +356,14 @@ html, body{
 }
 
 #start-btn{
-  height: 34px;
-  padding: 0 16px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  height: 32px;
+  padding: 0 14px;
+  background: var(--bg-lighter);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
   color: var(--text);
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
   display: flex;
@@ -300,24 +372,24 @@ html, body{
 }
 
 #start-btn:hover{
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 #taskbar-apps{
-  display: flex;
+  display:flex;
   gap: 4px;
   flex: 1;
 }
 
 .taskbar-app{
-  height: 38px;
+  height: 36px;
   padding: 0 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid transparent;
-  border-radius: 6px;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   color: var(--text);
-  font-size: 12px;
+  font-size:12px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -330,13 +402,13 @@ html, body{
 }
 
 .taskbar-app:hover{
-  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 -2px 0 var(--border-strong);
 }
 
 .taskbar-app.active{
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 10%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-light));
+  border-color: var(--accent);
+  box-shadow: inset 2px 0 0 var(--accent);
 }
 
 #system-tray{
@@ -344,188 +416,218 @@ html, body{
   align-items: center;
   gap: 12px;
   padding: 0 12px;
-  height: 34px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 6px;
+  height: 32px;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   font-size: 12px;
   color: var(--text-dim);
 }
 
-.tray-icon{font-size: 13px;}
+.tray-icon{
+  font-size: 13px;
+}
 
-/* -- Start Menu -- */
-
-#start-menu{
+#start-menu {
   position: fixed;
   bottom: 56px;
   left: 16px;
   width: 380px;
   max-height: min(640px, calc(100vh - 88px));
   background: var(--taskbar-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   z-index: 101;
   overflow-y: auto;
   overflow-x: hidden;
-  animation: menuOpen 0.2s ease;
+  animation: menuOpen 0.16s ease;
 }
 
-@keyframes menuOpen{
-  from {opacity: 0; transform: translateY(10px);}
-  to {opacity: 1; transform: translateY(0);}
+@keyframes menuOpen {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-#start-menu.hidden{
+#start-menu.hidden {
   display: none;
 }
 
-/* Greeting header: icon, name + time-aware greeting and date on the right*/
-.start-greeting{
+.start-greeting {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 18px 18px 14px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent);
+  padding: 18px 18px 16px;
+  background: var(--bg-light);
   border-bottom: 1px solid var(--border);
 }
 
-.start-greeting-icon-badge{
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #5b6fd8, #8b5cf6);
+.start-greeting-icon-badge {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-lighter);
+  border: 1px solid var(--border-strong);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 
-.start-greeting-text{flex: 1;}
+.start-greeting-text {
+  flex: 1;
+}
 
-.start-greeting-title{font-size: 16px; font-weight: 700; color: var(--text);}
+.start-greeting-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--text);
+}
 
-.start-greeting-sub{font-size: 12px; color: var(--text-dim); margin-top: 2px;}
+.start-greeting-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 3px;
+  font-family: var(--font-mono);
+}
 
-.start-greeting-date{
-  font-size: 12px;
+.start-greeting-date {
+  font-size: 11px;
   color: var(--text-dim);
   text-align: right;
-  line-height: 1.4;
+  line-height: 1.5;
   white-space: nowrap;
+  font-family: var(--font-mono);
 }
 
-/* Search bar with a kbd-style "/" hint matching the global shortcut */
-.start-search{
+
+.start-search {
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 14px 16px 4px;
-  padding: 9px 10px 9px 14px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border);
-  border-radius: 20px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
 }
 
-.start-search-icon{font-size: 13px; color: var(--text-dim);}
+.start-search-icon {
+  font-size: 12px;
+  color: var(--text-dim);
+}
 
-.start-search input{
+.start-search input {
   flex: 1;
   background: transparent;
   border: none;
   outline: none;
   color: var(--text);
-  font-size: 13px;
+  font-size: 12px;
+  font-family: var(--font-mono);
 }
 
-.start-search input::placeholder{color: var(--text-dim);}
-
-.start-search-kbd{
-  font-size: 11px;
-  font-family: monospace;
+.start-search input::placeholder {
   color: var(--text-dim);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+}
+
+.start-search-kbd {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  background: var(--bg-lighter);
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
   padding: 2px 6px;
 }
 
-/* Section headers ("Pinned" gets a "Show all" link, "Recent" doesn't) */
-.start-section-header{
+.start-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px 6px;
 }
 
-.start-section-label{
-  font-size: 11px;
+.start-section-label {
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   color: var(--text-dim);
   padding: 14px 16px 6px;
 }
 
-.start-section-header .start-section-label{padding: 0;}
+.start-section-header .start-section-label {
+  padding: 0;
+}
 
-.start-section-link{
+.start-section-link {
   font-size: 11px;
   color: var(--accent);
   cursor: pointer;
 }
 
-.start-section-link:hover{text-decoration: underline;}
-
-/* Pinned app tiles, 4 across each icon sitting in its own coloured badge */
-.start-grid{
+.start-section-link:hover {
+  text-decoration: underline;
+}
+.start-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   padding: 4px 14px 14px;
 }
 
-.start-app{
+.start-app {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 12px 4px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   cursor: pointer;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-light);
   transition: var(--transition);
 }
 
-.start-app:hover{
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
-  transform: translateY(-2px);
+.start-app:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-light));
 }
 
-.start-app:active{transform: translateY(0) scale(0.96);}
+.start-app:active {
+  transform: scale(0.96);
+}
 
-/* The badge colour comes from each app's `badge` property set inline via JS */
-.start-app-icon-badge{
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+.start-app-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  font-size: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
-.start-app-label{font-size: 11px; color: var(--text); text-align: center;}
+.start-app-label {
+  font-size: 10px;
+  color: var(--text);
+  text-align: center;
+}
 
-.start-grid-empty{
+.start-grid-empty {
   grid-column: 1 / -1;
   text-align: center;
   font-size: 12px;
@@ -533,58 +635,93 @@ html, body{
   padding: 16px;
 }
 
-/* Staggering each tile in slightly after the last so the grid cascades
-   into view instead of all popping in at once */
-
-.start-grid .start-app{opacity: 0; animation: tileIn 0.25s ease forwards;}
-.start-grid .start-app:nth-child(1){animation-delay: 0.02s;}
-.start-grid .start-app:nth-child(2){animation-delay: 0.05s;}
-.start-grid .start-app:nth-child(3){animation-delay: 0.08s;}
-.start-grid .start-app:nth-child(4){animation-delay: 0.11s;}
-.start-grid .start-app:nth-child(5){animation-delay: 0.14s;}
-.start-grid .start-app:nth-child(6){animation-delay: 0.17s;}
-.start-grid .start-app:nth-child(7){animation-delay: 0.20s;}
-.start-grid .start-app:nth-child(8){animation-delay: 0.23s;}
-
-@keyframes tileIn{
-  from {opacity: 0; transform: translateY(6px);}
-  to {opacity: 1; transform: translateY(0);}
+.start-grid .start-app {
+  opacity: 0;
+  animation: tileIn 0.2s ease forwards;
 }
 
-/* Recent -> Apps that have actually been opened with a real timestamp */
-.start-recent-list{
+.start-grid .start-app:nth-child(1) {
+  animation-delay: 0.02s;
+}
+
+.start-grid .start-app:nth-child(2) {
+  animation-delay: 0.04s;
+}
+
+.start-grid .start-app:nth-child(3) {
+  animation-delay: 0.06s;
+}
+
+.start-grid .start-app:nth-child(4) {
+  animation-delay: 0.08s;
+}
+
+.start-grid .start-app:nth-child(5) {
+  animation-delay: 0.10s;
+}
+
+.start-grid .start-app:nth-child(6) {
+  animation-delay: 0.12s;
+}
+
+.start-grid .start-app:nth-child(7) {
+  animation-delay: 0.14s;
+}
+
+.start-grid .start-app:nth-child(8) {
+  animation-delay: 0.16s;
+}
+
+@keyframes tileIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.start-recent-list {
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 0 10px 8px;
 }
 
-.start-recent-item{
+.start-recent-item {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 7px 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition);
 }
 
-.start-recent-item:hover{background: rgba(255, 255, 255, 0.05);}
+.start-recent-item:hover {
+  background: var(--bg-light);
+}
 
-.start-recent-icon-badge{
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  border-radius: 8px;
+.start-recent-icon-badge {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 12px;
 }
 
-.start-recent-text{flex: 1; min-width: 0;}
+.start-recent-text {
+  flex: 1;
+  min-width: 0;
+}
 
-.start-recent-title{
+.start-recent-title {
   font-size: 12px;
   color: var(--text);
   white-space: nowrap;
@@ -592,16 +729,25 @@ html, body{
   text-overflow: ellipsis;
 }
 
-.start-recent-sub{font-size: 10px; color: var(--text-dim);}
+.start-recent-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+}
 
-.start-recent-time{font-size: 11px; color: var(--text-dim); white-space: nowrap;}
+.start-recent-time {
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
 
-.start-recent-empty{padding: 6px 16px 14px; text-align: center; font-size: 12px; color: var(--text-dim);}
+.start-recent-empty {
+  padding: 6px 16px 14px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+}
 
-/* Quick toggles -> Dark mode and Sound are real settings shared with the Settings panel
-   Wifi/Bluetooth are cosmetic only, no real hardware to control from a browser tab */
-
-.start-toggles{
+.start-toggles {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 6px;
@@ -609,33 +755,43 @@ html, body{
   border-top: 1px solid var(--border);
 }
 
-.start-toggle{
+.start-toggle {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-lg);
+  background: var(--bg-light);
   border: 1px solid var(--border);
   cursor: pointer;
   transition: var(--transition);
 }
 
-.start-toggle:hover{background: rgba(255, 255, 255, 0.07);}
-
-.start-toggle.active{
-  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+.start-toggle:hover {
+  border-color: var(--border-strong);
 }
 
-.start-toggle-icon{font-size: 15px;}
+.start-toggle.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-light));
+}
 
-.start-toggle-label{font-size: 11px; color: var(--text); font-weight: 500;}
+.start-toggle-icon {
+  font-size: 14px;
+}
 
-.start-toggle-sub{font-size: 10px; color: var(--text-dim);}
+.start-toggle-label {
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 500;
+}
 
-/* User profile row */
-.start-profile{
+.start-toggle-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.start-profile {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -643,21 +799,25 @@ html, body{
   border-top: 1px solid var(--border);
 }
 
-.start-profile-avatar{
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f6b73c, #f87c56);
+.start-profile-avatar {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 14px;
 }
 
-.start-profile-name{font-size: 13px; font-weight: 500; color: var(--text);}
+.start-profile-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
 
-.start-profile-status{
+.start-profile-status {
   font-size: 11px;
   color: var(--text-dim);
   display: flex;
@@ -665,110 +825,127 @@ html, body{
   gap: 5px;
 }
 
-.status-dot{
+.status-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #2ecc71;
+  background: var(--ok);
   display: inline-block;
 }
 
-/* Footer (Shut Down) sits below as its own row, not part of the grid
-   since it's a system action not a pinned app */
-.start-footer{padding: 8px; border-top: 1px solid var(--border)}
+.start-footer {
+  padding: 8px;
+  border-top: 1px solid var(--border)
+}
 
-.start-app-row{
+.start-app-row {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition);
 }
 
-.start-app-row:hover{background: rgba(255, 255, 255, 0.06);}
+.start-app-row:hover {
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  color: var(--danger);
+}
 
-.start-list-icon{font-size: 16px;}
-.start-list-label{font-size: 13px; color: var(--text);}
+.start-list-icon {
+  font-size: 15px;
+}
 
-/* Keyboard focus states -> every interactive element in the start menu is a plain <div> with a click handler
-   so without this, tab focusing one shows no visible indicator at all, :focus-visible only shows the ring 
-   for keyboard focus not mouse clicks so it doesn't add a visual outline every time it's clicked */
+.start-list-label {
+  font-size: 12px;
+  color: var(--text);
+}
 
 .start-app:focus-visible,
 .start-recent-item:focus-visible,
 .start-toggle:focus-visible,
 .start-app-row:focus-visible,
-.start-section-link:focus-visible{outline: 2px solid var(--accent); outline-offset: 2px;}
+.start-section-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 /* -- Apps Folder -- */
 
-.apps-folder{
+.apps-folder {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 16px;
+  gap: 14px;
   padding: 8px;
 }
 
-.folder-item{
+.folder-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   padding: 12px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: var(--transition);
-  border: 1px solid transparent;
+  border: 1px dashed transparent;
 }
 
-.folder-item:hover{
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--border);
-  transform: translateY(-2px);
+.folder-item:hover {
+  background: var(--bg-light);
+  border-color: var(--border-strong);
 }
 
-.folder-icon{
-  font-size: 36px;
+.folder-icon {
+  font-size: 34px;
 }
 
-.folder-label{
-  font-size: 12px;
+.folder-label {
+  font-size: 11px;
   color: var(--text-dim);
+  font-family: var(--font-mono);
 }
 
 /* -- Terminal -- */
 
-.terminal-app{
-  /* .window-content already has 16px padding so it must be cancelled out here */
+.terminal-app {
   margin: -16px;
   height: calc(100% + 32px);
   display: flex;
   flex-direction: column;
-  background: #0c0c14;
-  font-family: 'Cascadia Code', 'Courier New', monospace;
+  background: #100d09;
+  font-family: var(--font-mono);
   font-size: 13px;
 }
 
-.terminal-output{
+.terminal-output {
   flex: 1;
   overflow-y: auto;
   padding: 12px 14px;
-  color: #d0d0e0;
+  color: #cfc4ad;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-.terminal-line{line-height: 1.6;}
+.terminal-line {
+  line-height: 1.6;
+}
 
-.terminal-line.command{color: var(--text);}
+.terminal-line.command {
+  color: var(--text);
+}
 
-.terminal-line.error{color: var(--danger);}
+.terminal-line.error {
+  color: var(--danger);
+}
 
-.terminal-prompt-inline{color: var(--accent); margin-right: 6px;}
+.terminal-prompt-inline {
+  color: var(--accent);
+  margin-right: 6px;
+}
 
-.terminal-input-row{
+.terminal-input-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -776,7 +953,7 @@ html, body{
   border-top: 1px solid var(--border);
 }
 
-.terminal-input{
+.terminal-input {
   flex: 1;
   background: transparent;
   border: none;
@@ -788,24 +965,27 @@ html, body{
 
 /* -- Settings -- */
 
-.settings-app{
+.settings-app {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 8px;
+  gap: 22px;
+  padding: 9px;
+  font-family: var(--font-body);
 }
 
-.settings-section h3{
-  font-size: 14px;
+.settings-section h3 {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   color: var(--text-dim);
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
 }
 
-.setting-row{
+.setting-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -813,48 +993,53 @@ html, body{
   font-size: 14px;
 }
 
-.toggle{
-  padding: 6px 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border);
-  border-radius: 20px;
+.toggle {
+  padding: 5px 12px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
   color: var(--text-dim);
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   cursor: pointer;
   transition: var(--transition);
-  min-width: 60px;
+  min-width: 56px;
+  text-align: center;
 }
 
-.toggle.active{
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
+.toggle.active {
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-light));
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.accent-colors{
+.accent-colors {
   display: flex;
   gap: 8px;
 }
 
-.accent-btn{
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+.accent-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-lg);
   border: 2px solid transparent;
   cursor: pointer;
   transition: var(--transition);
 }
 
-.accent-btn:hover{
-  transform: scale(1.15);
+.accent-btn:hover {
+  transform: translateY(-2px);
 }
 
-.accent-btn.active{
+.accent-btn.active {
   border-color: var(--text);
   box-shadow: 0 0 0 2px var(--bg-light);
 }
 
-.settings-section p{
+.settings-section p {
+  font-family: var(--font-body);
   font-size: 13px;
   color: var(--text-dim);
   line-height: 1.6;
@@ -862,72 +1047,68 @@ html, body{
 
 /* -- Scrollbar -- */
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track{
+::-webkit-scrollbar-track {
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb{
-  background: rgba(255, 255, 255, 0.1);
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover{
-  background: rgba(255, 255, 255, 0.2);
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent) 40%, var(--border-strong));
 }
 
 /* -- Context Menu -- */
-.context-menu{
+.context-menu {
   position: fixed;
   min-width: 180px;
-  background: var(--taskbar-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: var(--bg-lighter);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 6px;
+  padding: 4px;
   z-index: 200;
-  animation: menuOpen 0.12s ease;
+  animation: menuOpen 0.1s ease;
 }
 
-.context-menu-item{
+.context-menu-item {
   padding: 8px 12px;
-  font-size: 13px;
-  border-radius: 6px;
+  font-size: 12px;
+  border-radius: 2px;
   cursor: pointer;
   color: var(--text);
   transition: var(--transition);
 }
 
-.context-menu-item:hover{
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
+.context-menu-item:hover {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
 }
 
-.context-menu-item.disabled{
+.context-menu-item.disabled {
   color: var(--text-dim);
   cursor: default;
   opacity: 0.6;
 }
 
-.context-menu-item.disabled:hover{
+.context-menu-item.disabled:hover {
   background: none;
+  color: var(--text-dim);
 }
 
-/* -- Utility -- */
-
-.hidden{
+.hidden {
   display: none !important;
 }
 
-/* The animations toggle in settings adds this class to <html>
-   it overrides every animation and transition in one place
-   instead of conditionally applying each one in JS. */
-
-.no-animations *, .no-animations *::before, .no-animations *::after{
+.no-animations *,
+.no-animations *::before,
+.no-animations *::after {
   animation-duration: 0.001s !important;
   animation-delay: 0s !important;
   transition: none !important;

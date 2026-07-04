@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS = {
   darkmode: false,
   animations: true,
   sounds: false,
-  accent: "#4ecdc4",
+  accent: "#d1893f",
   // Cosmetic only, no real access to Wi-Fi/Bluetooh
   wifi: true,
   bluetooth: true,
@@ -140,14 +140,14 @@ const clockEl = document.getElementById("clock");
 
 // -------------------- App definitions ------------------------
 const apps = {
-  browser: { title: "Browser", icon: "🌐", template: "content-browser", badge: "#1f6feb" },
-  terminal: { title: "Terminal", icon: "💻", template: "content-terminal", locked: true, badge: "#1c1c24" },
-  notepad: { title: "Notepad", icon: "📝", template: "content-notepad", badge: "#e8e8f0" },
-  apps: { title: "Apps", icon: "🗂️", template: "app-apps", locked: true, badge: "#e3a627" },
-  settings: { title: "Settings", icon: "⚙️", template: "app-settings", locked: true, badge: "#525a6b" },
-  calculator: { title: "Calculator", icon: "🧮", template: "content-calculator", badge: "#e0574a" },
-  moodlamp: { title: "Mood Lamp", icon: "🔮", template: "content-moodlamp", badge: "linear-gradient(135deg, #a06bff, #ff6bcb)" },
-  fortune: { title: "Fortune", icon: "🥠", template: "content-fortune", badge: "#c9974a" },
+  browser: { title: "Browser", icon: "🌐", template: "content-browser", badge: "#6a8caf" },
+  terminal: { title: "Terminal", icon: "💻", template: "content-terminal", locked: true, badge: "#2c2519" },
+  notepad: { title: "Notepad", icon: "📝", template: "content-notepad", badge: "#ede4d0" },
+  apps: { title: "Apps", icon: "🗂️", template: "app-apps", locked: true, badge: "#d1893f" },
+  settings: { title: "Settings", icon: "⚙️", template: "app-settings", locked: true, badge: "#6b6355" },
+  calculator: { title: "Calculator", icon: "🧮", template: "content-calculator", badge: "#b8503f" },
+  moodlamp: { title: "Mood Lamp", icon: "🔮", template: "content-moodlamp", badge: "linear-gradient(135deg, #d1893f, #b8503f)" },
+  fortune: { title: "Fortune", icon: "🥠", template: "content-fortune", badge: "#7a9b5c" },
 };
 
 state.pinnedApps = loadPinnedApps();
@@ -272,12 +272,11 @@ document.getElementById("start-search-input")?.addEventListener("keydown", (e) =
   if(firstTile) firstTile.click();
 });
 
-// Global "/" shortcut to jump straight into search, matching the kbd hint
+// global "/" shortcut to jump straight into search, matching the kbd hint
 // shown in the search bar. Skipped while typing in a real input or textarea
-// so it doens't hijack typing a literal "/" in Notepad
+// so it doens't hijack typing a literal "/" in notepad
 
-// Escape closes the menu from anywhere, same listener since both are 
-// just "global keys the start menu cares about"
+// Escape closes the menu from anywhere
 document.addEventListener("keydown", (e) => {
   if(e.key === "Escape" && !startMenu.classList.contains("hidden")){
     closeStartMenu();
@@ -308,10 +307,10 @@ function openWindow(appKey){
   win.style.top = 30 + ((id * 30) % 150) + "px";
   win.style.zIndex = 1000 + id;
 
-  // Set title
+  // Setting title
   win.querySelector(".window-title").textContent = app.icon + " " + app.title;
 
-  // Set content
+  // Setting content
   const contentArea = win.querySelector(".window-content");
   if(app.template){
     const tmpl = document.getElementById(app.template);
@@ -329,15 +328,15 @@ function openWindow(appKey){
   // Focus on click
   win.addEventListener("mousedown", () => focusWindow(id));
 
-  // Make draggable and resizable
+  // Making it draggable and resizable
   makeDraggable(win);
   makeResizable(win);
 
-  // Add to layer
+  // Adding to layer
   windowLayer.appendChild(win);
   state.windows.set(id, win);
 
-  // Add taskbar button
+  // Adding taskbar button
   const btn = document.createElement("div");
   btn.className = "taskbar-app";
   btn.dataset.winId = id;
@@ -356,7 +355,7 @@ function openWindow(appKey){
   focusWindow(id);
   startMenu.classList.add("hidden");
 
-  // Wire up app-specific interactions
+  // Wiring up app-specific interactions
   if(appKey === "apps") wireAppsFolder(contentArea);
   if(appKey === "settings") wireSettings(contentArea);
   if(appKey === "notepad") wireNotepad(contentArea);
@@ -418,7 +417,7 @@ function toggleMaximize(id){
   win.classList.toggle("maximized");
 }
 
-// --- Dragging (with bounds clamping and edge snapping) ---
+// ------ Dragging (with bounds clamping and edge snapping) -------
 const TASKBAR_HEIGHT = 48;
 const SNAP_TRIGGER = 24; // px from screen edge that triggers a snap zone
 const snapPreview = document.getElementById("snap-preview");
@@ -437,8 +436,8 @@ function makeDraggable(win){
     focusWindow(parseInt(win.dataset.id));
 
     // If this window is currently snapped, "pop" it back to the size it
-    // had before snapping, keeping it anchored under the cursor.
-    // Dragging a snapped window will feel more natural instead of janky.
+    // had before snapping, keeping it anchored under the cursor
+    // Dragging a snapped window will feel more natural instead of janky
     if(win.dataset.snapped){
       const prevWidth = parseFloat(win.dataset.prevWidth) || 600;
       const prevHeight = parseFloat(win.dataset.prevHeight) || 400;
@@ -468,8 +467,6 @@ function makeDraggable(win){
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
 
-    // Clamp so the window always keeps enough of itself on-screen
-    // to grab again. it can hang off an edge but never disappear
     const margin = 40;
     const minLeft = -(win.offsetWidth - margin);
     const maxLeft = window.innerWidth - margin;
@@ -744,7 +741,7 @@ function buildRecentList(){
 const QUICK_TOGGLES = [
   { key: "wifi", icon: "📶", label: "Wi-Fi" },
   { key: "bluetooth", icon: "🔷", label: "Bluetooth" },
-  { key: "darkmode", icon: "🌙", label: "Dark Mode" },
+  { key: "darkmode", icon: "🌙", label: "Light Mode" },
   { key: "sounds", icon: "🔊", label: "Sound" },
 ];
 
@@ -980,7 +977,7 @@ const TERMINAL_COMMANDS = {
       "  pin <app>            pin an app to the start menu",
       "  unpin <app>          unpin an app from the start menu",
       "  theme <#hex>         change the accent color",
-      "  darkmode <on/off>    toggle dark mode",
+      "  darkmode <on/off>    toggle light mode",
       "  sound <on/off>       toggle the sound settings",
       "  wifi <on/off>        toggle wifi (cosmetic)",
       "  bluetooth <on/off>   toggle bluetooth (cosmetic)",
@@ -989,9 +986,6 @@ const TERMINAL_COMMANDS = {
       "  shutdown             shut down AuriaOS"
     ];
   },
-
-  // `clear` is handled as a special return value rather than touching the
-  // DOM directly. wireTerminal() owns all the actual rendering
 
   clear(){
     return{clear: true}
