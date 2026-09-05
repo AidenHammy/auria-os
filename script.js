@@ -1,4 +1,4 @@
-// ------------ Persistence -----------------
+// --------- Persistence -----
 // Settings and notepad text survive a refresh via localStorage
 // Window positions/open apps are NOT persisted yet
 
@@ -17,6 +17,9 @@ const DEFAULT_SETTINGS = {
   // Cosmetic only, no real access to Wi-Fi/Bluetooh
   wifi: true,
   bluetooth: true,
+  moodOn: false,
+  moodColor: "#d1893f",
+  moodIntensity: 0.3
 };
 
 function loadSettings(){
@@ -49,6 +52,18 @@ function applySettings(){
   document.documentElement.classList.toggle("no-animations", !state.settings.animations);
 }
 
+// Separate from applySettings() since it targets one
+// specific element rather than the whole document but follows the same
+// "call at startup + call on every change" pattern
+
+function applyMoodLamp(){
+  const overlay = document.getElementById("mood-overlay");
+  if(!overlay) return;
+  overlay.style.background = state.settings.moodColor;
+  overlay.style.setProperty("--mood-intensity", state.settings.moodIntensity);
+  overlay.classList.toggle("active", state.settings.moodOn);
+}
+
 // Locked apps are always pinned no matter what's saved
 // it will guarantee the start menu never ends up empty
 function loadPinnedApps(){
@@ -74,7 +89,7 @@ function savePinnedApps(){
   }
 }
 
-// ------- Recent Apps ---------
+//  Recent Apps 
 // Tracks apps that've actually been opened WITH a real timestamp
 
 const MAX_RECENT = 5;
@@ -118,7 +133,7 @@ function formatRelativeTime(timestamp){
   return `${diffDay}d ago`;
 }
 
-// --- State ---
+// State 
 const state = {
   windows: new Map(),
   nextId: 1,
@@ -129,8 +144,9 @@ const state = {
 };
 
 applySettings();
+applyMoodLamp();
 
-// ------------------- DOM refs ------------------------
+// DOM refs 
 const desktop = document.getElementById("desktop");
 const windowLayer = document.getElementById("window-layer");
 const taskbarApps = document.getElementById("taskbar-apps");
@@ -138,7 +154,7 @@ const startBtn = document.getElementById("start-btn");
 const startMenu = document.getElementById("start-menu");
 const clockEl = document.getElementById("clock");
 
-// -------------------- App definitions ------------------------
+// App definitions 
 const apps = {
   browser: { title: "Browser", icon: "🌐", template: "content-browser", badge: "#6a8caf" },
   terminal: { title: "Terminal", icon: "💻", template: "content-terminal", locked: true, badge: "#2c2519" },
@@ -168,7 +184,7 @@ function togglePinned(key){
   buildStartMenu(currentQuery);
 }
 
-// ------- Clock --------
+//  Clock ---
 function updateClock(){
   const now = new Date();
   clockEl.textContent = now.toLocaleTimeString([], {
@@ -180,7 +196,7 @@ function updateClock(){
 setInterval(updateClock, 1000);
 updateClock();
 
-// ---------- Greeting & Date --------------
+// - Greeting & Date ----
 // A small personal touch in the start menu header
 const USER_NAME = "Aiden";
 
@@ -234,7 +250,7 @@ function closeStartMenu(){
   resetStartSearch();
 }
 
-// ---------- Start Menu Toggle ------------
+// -- Start Menu Toggle 
 startBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   if(startMenu.classList.contains("hidden")) openStartMenu();
@@ -290,7 +306,7 @@ document.addEventListener("keydown", (e) => {
   else document.getElementById("start-search-input")?.focus();
 });
 
-// ------ Open Window ------
+//Open Window 
 function openWindow(appKey){
   const app = apps[appKey];
   if(!app) return;
@@ -417,7 +433,7 @@ function toggleMaximize(id){
   win.classList.toggle("maximized");
 }
 
-// ------ Dragging (with bounds clamping and edge snapping) -------
+// Dragging (with bounds clamping and edge snapping)
 const TASKBAR_HEIGHT = 48;
 const SNAP_TRIGGER = 24; // px from screen edge that triggers a snap zone
 const snapPreview = document.getElementById("snap-preview");
@@ -924,7 +940,7 @@ function syncSettingsUI(container){
   });
 }
 
-// ----- Notepad Wiring -------
+// Notepad Wiring
 function wireNotepad(container){
   const textarea = container.querySelector("textarea");
   if(!textarea) return;
@@ -943,6 +959,142 @@ function wireNotepad(container){
       console.warn("Couldn't save notes.", err);
     }
   });
+}
+
+// Immediate-execution style (like a physical calculator!) 6 + 3 × 2 =
+// evaluates left-to-right, not by operator precedence. Resets fresh
+// every time the window opens, nothing here is persisted on purpose
+function wireCalculator(container){
+  const valueEl = container.querySelector("#calc-value");
+  const subEl = container.querySelector("#calc-sub");
+  const winEl = container.closest(".window");
+  if(!valueEl || !subEl) return;
+ 
+  let current = "0";
+  let previous = null;
+  let operator = null;
+  let overwrite = true; // true means the next digit replaces the display
+ 
+  // Trims float noise (0.1 + 0.2 shouldn't show 0.30000000000000004)
+  // without permanently truncating legitimately long numbers
+  function formatNum(n){
+    return Number(n.toPrecision(12)).toString();
+  }
+ 
+  function updateDisplay(){
+    valueEl.textContent = current;
+    subEl.textContent = (previous !== null && operator) ? `${formatNum(previous)} ${operator}` : "";
+  }
+ 
+  function inputDigit(d){
+    if(current === "Error") clearAll();
+    if(overwrite || current === "0"){
+      current = d === "." ? "0." : d;
+      overwrite = false;
+    } else{
+      if(d === "." && current.includes(".")) return;
+      current += d;
+    }
+    updateDisplay();
+  }
+ 
+  function clearAll(){
+    current = "0";
+    previous = null;
+    operator = null;
+    overwrite = true;
+    updateDisplay();
+  }
+ 
+  function backspace(){
+    if(overwrite) return;
+    current = current.slice(0, -1);
+    if(current === "" || current === "-") current = "0";
+    if(current === "0") overwrite = true;
+    updateDisplay();
+  }
+ 
+  function percent(){
+    current = formatNum(parseFloat(current) / 100);
+    updateDisplay();
+  }
+ 
+  function compute(a, op, b){
+    switch(op){
+      case "+": return a + b;
+      case "−": return a - b;
+      case "×": return a * b;
+      case "÷": return b === 0 ? NaN : a / b;
+      default: return b;
+    }
+  }
+ 
+  function chooseOperator(op){
+    if(current === "Error") return;
+    const value = parseFloat(current);
+    if(previous !== null && operator && !overwrite){
+      const result = compute(previous, operator, value);
+      if(Number.isNaN(result)){
+        current = "Error";
+        previous = null;
+        operator = null;
+        overwrite = true;
+        updateDisplay();
+        return;
+      }
+      previous = result;
+      current = formatNum(result);
+    } else{
+      previous = value;
+    }
+    operator = op;
+    overwrite = true;
+    updateDisplay();
+  }
+ 
+  function equals(){
+    if(operator === null || previous === null || current === "Error") return;
+    const result = compute(previous, operator, parseFloat(current));
+    current = Number.isNaN(result) ? "Error" : formatNum(result);
+    previous = null;
+    operator = null;
+    overwrite = true;
+    updateDisplay();
+  }
+ 
+  container.querySelectorAll(".calc-btn[data-digit]").forEach((btn) => {
+    btn.addEventListener("click", () => inputDigit(btn.dataset.digit));
+  });
+  container.querySelectorAll(".calc-btn[data-op]").forEach((btn) => {
+    btn.addEventListener("click", () => chooseOperator(btn.dataset.op));
+  });
+  container.querySelector('[data-action="decimal"]')?.addEventListener("click", () => inputDigit("."));
+  container.querySelector('[data-action="clear"]')?.addEventListener("click", clearAll);
+  container.querySelector('[data-action="backspace"]')?.addEventListener("click", backspace);
+  container.querySelector('[data-action="percent"]')?.addEventListener("click", percent);
+  container.querySelector('[data-action="equals"]')?.addEventListener("click", equals);
+ 
+  // Keyboard support, but only while THIS calculator is the focused
+  // window — otherwise typing in the terminal/notepad in another window
+  // would get hijacked by whichever calculator happened to open first
+  const KEY_OPS = {"+": "+", "-": "−", "*": "×", "/": "÷"};
+  function handleKey(e){
+    if(!document.body.contains(winEl)){
+      document.removeEventListener("keydown", handleKey);
+      return;
+    }
+    if(state.activeWindow !== winEl) return;
+ 
+    if(/^[0-9]$/.test(e.key)) inputDigit(e.key);
+    else if(e.key === ".") inputDigit(".");
+    else if(KEY_OPS[e.key]) chooseOperator(KEY_OPS[e.key]);
+    else if(e.key === "Enter" || e.key === "=" ){ e.preventDefault(); equals(); }
+    else if(e.key === "Backspace") backspace();
+    else if(e.key === "Escape") clearAll();
+  }
+  document.addEventListener("keydown", handleKey);
+ 
+  updateDisplay();
 }
 
 // ------------ Terminal -------------------
@@ -977,7 +1129,7 @@ const TERMINAL_COMMANDS = {
       "  pin <app>            pin an app to the start menu",
       "  unpin <app>          unpin an app from the start menu",
       "  theme <#hex>         change the accent color",
-      "  darkmode <on/off>    toggle light mode",
+      "  lightmode <on/off>   toggle light mode",
       "  sound <on/off>       toggle the sound settings",
       "  wifi <on/off>        toggle wifi (cosmetic)",
       "  bluetooth <on/off>   toggle bluetooth (cosmetic)",
@@ -1045,7 +1197,7 @@ const TERMINAL_COMMANDS = {
     return `Accent color set to ${color}.`;
   },
 
-  darkmode(args){
+  lightmode(args){
     return toggleBooleanSetting("darkmode", args[0]);
   },
 
@@ -1168,11 +1320,11 @@ function wireTerminal(container){
     if(window.getSelection().toString() === "") input.focus();
   });
 
-  printLine("AuriaOS Terminal — type 'help' to see available commands.");
+  printLine("AuriaOS Terminal - type 'help' to see available commands.");
   input.focus();
 }
 
-// -------- Context Menu ---------------
+// ----- Context Menu
 // Generic right-click menu built fresh each time it's shown
 // and torn down on close, can be reused for anything
 
