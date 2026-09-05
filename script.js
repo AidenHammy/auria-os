@@ -376,6 +376,8 @@ function openWindow(appKey){
   if(appKey === "settings") wireSettings(contentArea);
   if(appKey === "notepad") wireNotepad(contentArea);
   if(appKey === "terminal") wireTerminal(contentArea);
+  if(appKey === "calculator") wireCalculator(contentArea);
+  if(appKey === "moodlamp") wireMoodLamp(contentArea);
 }
 
 function closeWindow(id){
@@ -1160,14 +1162,14 @@ function wireMoodLamp(container){
 
 // Shared by every on/off-style setting command (darkmode, sound, wifi, bluetooth)
 // so the validation/apply/sync logic only exists once
-function toggleBooleanSetting(key, arg){
-  if(arg !== "on" && arg!== "off") return `Usage: ${key} <on/off>`;
+function toggleBooleanSetting(key, arg, label = key){
+  if(arg !== "on" && arg!== "off") return `Usage: ${label} <on/off>`;
   state.settings[key] = arg === "on";
   saveSettings();
   if(key === "darkmode") applySettings(); // real visual effect
   syncQuickToggles();
   syncOpenSettingsPanels();
-  return `${key} turned ${arg}`;
+  return `${label} turned ${arg}`;
 }
 
 const TERMINAL_COMMANDS = {
@@ -1253,7 +1255,7 @@ const TERMINAL_COMMANDS = {
   },
 
   lightmode(args){
-    return toggleBooleanSetting("darkmode", args[0]);
+    return toggleBooleanSetting("darkmode", args[0], "lightmode");
   },
 
   sound(args){
@@ -1379,7 +1381,7 @@ function wireTerminal(container){
   input.focus();
 }
 
-// ----- Context Menu
+//        Context Menu
 // Generic right-click menu built fresh each time it's shown
 // and torn down on close, can be reused for anything
 

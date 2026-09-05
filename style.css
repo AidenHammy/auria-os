@@ -340,6 +340,21 @@ html, body{
   opacity: 1;
 }
 
+#mood-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.4s ease, background 0.4s ease;
+}
+
+#mood-overlay.active {
+  opacity: var(--mood-intensity, 0.3);
+}
+
 #taskbar{
   position: fixed;
   bottom: 0; left: 0;
@@ -871,7 +886,7 @@ html, body{
   outline-offset: 2px;
 }
 
-/* -- Apps Folder -- */
+/* Apps Folder */
 
 .apps-folder {
   display: grid;
@@ -907,7 +922,7 @@ html, body{
   font-family: var(--font-mono);
 }
 
-/* -- Terminal -- */
+/* Terminal */
 
 .terminal-app {
   margin: -16px;
@@ -963,7 +978,150 @@ html, body{
   font-size: 13px;
 }
 
-/* -- Settings -- */
+/* Calculator */
+
+.calculator-app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calc-display {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 64px;
+}
+
+.calc-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+  min-height: 14px;
+}
+
+.calc-value {
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.1;
+  text-align: right;
+  word-break: break-all;
+}
+
+.calc-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 8px;
+}
+
+.calc-btn {
+  background: var(--bg-light);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.calc-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.calc-btn:active {
+  transform: scale(0.96);
+}
+
+.calc-op {
+  color: var(--accent);
+}
+
+.calc-danger {
+  color: var(--danger);
+}
+
+.calc-danger:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, var(--bg-light));
+}
+
+.calc-equals {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1c1810;
+}
+
+.calc-equals:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #1c1810;
+}
+
+.calc-wide {
+  grid-column: span 2;
+}
+
+/* Mood Lamp */
+
+.moodlamp-app {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.moodlamp-presets {
+  display: flex;
+  gap: 8px;
+  padding: 10px 0 18px;
+}
+
+.mood-preset {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-lg);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mood-preset:hover {
+  transform: translateY(-2px);
+}
+
+.mood-preset.active {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px var(--bg-light);
+}
+
+.moodlamp-app input[type="color"] {
+  width: 40px;
+  height: 26px;
+  padding: 2px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.moodlamp-app input[type="range"] {
+  width: 140px;
+  accent-color: var(--accent);
+}
+
+/*Settings */
 
 .settings-app {
   display: flex;
@@ -1045,7 +1203,7 @@ html, body{
   line-height: 1.6;
 }
 
-/* -- Scrollbar -- */
+/* Scrollbar */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -1064,7 +1222,7 @@ html, body{
   background: color-mix(in srgb, var(--accent) 40%, var(--border-strong));
 }
 
-/* -- Context Menu -- */
+/* Context Menu */
 .context-menu {
   position: fixed;
   min-width: 180px;
@@ -1113,3 +1271,4 @@ html, body{
   animation-delay: 0s !important;
   transition: none !important;
 }
+

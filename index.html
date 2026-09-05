@@ -43,6 +43,9 @@
 		<!-- Ghost preview shown while dragging a window to a screen edge -->
 		<div id="snap-preview"></div>
 
+		<!-- Ambient color wash controlled by the Mood Lamp app-->
+		<div id="mood-overlay"></div>
+
 	</div>
 
 	<!-- Taskbar at the bottom -->
@@ -152,14 +155,59 @@
 	<!-- Calculator -->
 	<template id="content-calculator">
 		<div class="calculator-app">
-			<div style="padding: 40px; text-align: center; color: var(--text-dim)">🧮 Calculator app</div>
+			<div class="calc-display">
+				<div class="calc-sub" id="calc-sub"></div>
+				<div class="calc-value" id="calc-value">0</div>
+			</div>
+			<div class="calc-grid">
+				<button class="calc-btn calc-danger" data-action="clear">AC</button>
+				<button class="calc-btn calc-danger" data-action="backspace">⌫</button>
+				<button class="calc-btn calc-op" data-action="percent">%</button>
+				<button class="calc-btn calc-op" data-op="÷">÷</button>
+	
+				<button class="calc-btn" data-digit="7">7</button>
+				<button class="calc-btn" data-digit="8">8</button>
+				<button class="calc-btn" data-digit="9">9</button>
+				<button class="calc-btn calc-op" data-op="×">×</button>
+	
+				<button class="calc-btn" data-digit="4">4</button>
+				<button class="calc-btn" data-digit="5">5</button>
+				<button class="calc-btn" data-digit="6">6</button>
+				<button class="calc-btn calc-op" data-op="−">−</button>
+	
+				<button class="calc-btn" data-digit="1">1</button>
+				<button class="calc-btn" data-digit="2">2</button>
+				<button class="calc-btn" data-digit="3">3</button>
+				<button class="calc-btn calc-op" data-op="+">+</button>
+	
+				<button class="calc-btn calc-wide" data-digit="0">0</button>
+				<button class="calc-btn" data-action="decimal">.</button>
+				<button class="calc-btn calc-equals" data-action="equals">=</button>
+			</div>
 		</div>
 	</template>
 
 	<!-- Mood Lamp -->
 	<template id="content-moodlamp">
 		<div class="moodlamp-app">
-			<div style="padding: 40px; text-align: center; color: var(--text-dim)">🔮 Mood Lamp app</div>
+			<div class="setting-row">
+				<label>Ambient Light</label>
+				<button class="toggle" id="mood-toggle">OFF</button>
+			</div>
+			<div class="moodlamp-presets">
+				<button class="mood-preset" style="background: #d1893f" data-color="#d1893f" title="Ember"></button>
+				<button class="mood-preset" style="background: #7a9b5c" data-color="#7a9b5c" title="Moss"></button>
+				<button class="mood-preset" style="background: #b8503f" data-color="#b8503f" title="Rust"></button>
+				<button class="mood-preset" style="background: #6a8caf" data-color="#6a8caf" title="Slate"></button>
+			</div>
+			<div class="setting-row">
+				<label>Custom color</label>
+				<input type="color" id="mood-color-input" value="#d1893f">
+			</div>
+			<div class="setting-row">
+				<label>Intensity</label>
+				<input type="range" id="mood-intensity-input" min="5" max="60" value="30">
+			</div>
 		</div>
 	</template>
 
