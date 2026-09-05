@@ -1097,7 +1097,62 @@ function wireCalculator(container){
   updateDisplay();
 }
 
-// ------------ Terminal -------------------
+// Controls a global setting (state.settings.mood*) not just this window
+// so it keeps affecting the desktop after the window is closed. same
+// pattern as Settings, just for one specific ambient effect instead of
+// the whole page
+
+function wireMoodLamp(container){
+  const toggleBtn = container.querySelector("#mood-toggle");
+  const colorInput = container.querySelector("#mood-color-input");
+  const intensityInput = container.querySelector("#mood-intensity-input");
+  if(!toggleBtn || !colorInput || !intensityInput) return;
+ 
+  function syncUI(){
+    toggleBtn.classList.toggle("active", state.settings.moodOn);
+    toggleBtn.textContent = state.settings.moodOn ? "ON" : "OFF";
+    colorInput.value = state.settings.moodColor;
+    intensityInput.value = Math.round(state.settings.moodIntensity * 100);
+    container.querySelectorAll(".mood-preset").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.color === state.settings.moodColor);
+    });
+  }
+ 
+  toggleBtn.addEventListener("click", () => {
+    state.settings.moodOn = !state.settings.moodOn;
+    saveSettings();
+    applyMoodLamp();
+    syncUI();
+  });
+ 
+  container.querySelectorAll(".mood-preset").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.settings.moodColor = btn.dataset.color;
+      state.settings.moodOn = true;
+      saveSettings();
+      applyMoodLamp();
+      syncUI();
+    });
+  });
+ 
+  colorInput.addEventListener("input", () => {
+    state.settings.moodColor = colorInput.value;
+    state.settings.moodOn = true;
+    saveSettings();
+    applyMoodLamp();
+    syncUI();
+  });
+ 
+  intensityInput.addEventListener("input", () => {
+    state.settings.moodIntensity = intensityInput.value / 100;
+    saveSettings();
+    applyMoodLamp();
+  });
+ 
+  syncUI();
+}
+
+//             Terminal 
 // A real shell. Commands like opening apps, pinnning/unpinning, changing
 // settings actually work. Shared logic lives here in TERMINAL_COMMANDS
 // Each open terminal window gets its own output log and command history via
