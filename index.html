@@ -95,6 +95,16 @@
 		</div>
 	</div>
 
+	<!--Calendar popover (taskbar clock)-->
+	<div id="clock-popover" class="hidden">
+		<div class="clock-popover-page">
+			<div class="clock-popover-weekday" id="clock-popover-weekday"></div>
+			<div class="clock-popover-daynum" id="clock-popover-daynum"></div>
+			<div class="clock-popover-month" id="clock-popover-month"></div>
+		</div>
+		<div class="clock-popover-calendar" id="clock-popover-calendar"></div>
+	</div>
+
 	<!-- Templates for windows -->
 	<template id="window-template">
 		<div class="window">
@@ -214,7 +224,15 @@
 	<!-- Fortune -->
 	<template id="content-fortune">
 		<div class="fortune-app">
-			<div style="padding: 40px; text-align: center; color: var(--text-dim)">🥠 Fortune Cookie app</div>
+			<div class="fortune-cookie" id="fortune-cookie" role="button" tabindex="0">🥠</div>
+			<div class="fortune-hint" id="fortune-hint">Click the cookie to crack it open</div>
+			<div class="fortune-slip hidden" id="fortune-slip">
+				<div class="fortune-slip-text" id="fortune-text"></div>
+				<div class="fortune-slip-divider"></div>
+				<div class="fortune-slip-numbers-label">Lucky Numbers</div>
+				<div class="fortune-slip-numbers" id="fortune-numbers"></div>
+			</div>
+			<button class="fortune-again hidden" id="fortune-again">Crack Another</button>
 		</div>
 	</template>
 

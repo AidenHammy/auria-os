@@ -1,4 +1,4 @@
-// --------- Persistence -----
+//                Persistence
 // Settings and notepad text survive a refresh via localStorage
 // Window positions/open apps are NOT persisted yet
 
@@ -153,6 +153,8 @@ const taskbarApps = document.getElementById("taskbar-apps");
 const startBtn = document.getElementById("start-btn");
 const startMenu = document.getElementById("start-menu");
 const clockEl = document.getElementById("clock");
+const taskbarEl = document.getElementById("taskbar");
+const clockPopover = document.getElementById("clock-popover");
 
 // App definitions 
 const apps = {
@@ -184,19 +186,112 @@ function togglePinned(key){
   buildStartMenu(currentQuery);
 }
 
-//  Clock ---
-function updateClock(){
+//  Clock 
+function updateClock() {
+  if (!clockEl) return; // Safety net!
   const now = new Date();
   clockEl.textContent = now.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   });
+  
+  // If the calendar is open, keep it updated in real-time
+  
+  if (clockPopover && !clockPopover.classList.contains("hidden")) {
+    buildClockCalendar();
+  }
 }
 
 setInterval(updateClock, 1000);
 updateClock();
 
-// - Greeting & Date ----
+// Clock Calendar Popover
+
+function buildClockCalendar(){
+  const weekdayEl = document.getElementById("clock-popover-weekday");
+  const daynumEl = document.getElementById("clock-popover-daynum");
+  const monthEl = document.getElementById("clock-popover-month");
+  const calEl = document.getElementById("clock-popover-calendar");
+  if(!weekdayEl || !daynumEl || !monthEl || !calEl) return;
+ 
+  const now = new Date();
+  weekdayEl.textContent = now.toLocaleDateString(undefined, {weekday: "long"});
+  daynumEl.textContent = now.getDate();
+  monthEl.textContent = now.toLocaleDateString(undefined, {month: "long", year: "numeric"});
+ 
+  calEl.innerHTML = "";
+  ["S", "M", "T", "W", "T", "F", "S"].forEach((label) => {
+    const cell = document.createElement("div");
+    cell.className = "clock-cal-weekday";
+    cell.textContent = label;
+    calEl.appendChild(cell);
+  });
+ 
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+ 
+  const startOffset = new Date(year, month, 1).getDay(); // 0 = Sunday
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+ 
+  // Faded leading days from the previous month
+  for(let i = startOffset - 1; i >= 0; i--){
+    const cell = document.createElement("div");
+    cell.className = "clock-cal-day other-month";
+    cell.textContent = daysInPrevMonth - i;
+    calEl.appendChild(cell);
+  }
+ 
+  for(let d = 1; d <= daysInMonth; d++){
+    const cell = document.createElement("div");
+    cell.className = "clock-cal-day" + (d === today ? " today" : "");
+    cell.textContent = d;
+    calEl.appendChild(cell);
+  }
+ 
+  // Faded trailing days so the grid always ends on a full week
+  const trailing = (7 - ((startOffset + daysInMonth) % 7)) % 7;
+  for(let d = 1; d <= trailing; d++){
+    const cell = document.createElement("div");
+    cell.className = "clock-cal-day other-month";
+    cell.textContent = d;
+    calEl.appendChild(cell);
+  }
+}
+
+function openClockPopover(){
+  if (!clockPopover) return;
+  buildClockCalendar();
+  clockPopover.classList.remove("hidden");
+}
+ 
+function closeClockPopover(){
+  if (!clockPopover) return;
+  clockPopover.classList.add("hidden");
+}
+ 
+if (clockEl){
+  clockEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if(!startMenu.classList.contains("hidden")) closeStartMenu();
+    if(clockPopover.classList.contains("hidden")) openClockPopover();
+    else closeClockPopover();
+  });
+}
+ 
+document.addEventListener("click", (e) => {
+  if(!clockPopover) return;
+  if(!clockPopover.classList.contains("hidden") && !clockPopover.contains(e.target) && e.target !== clockEl){
+    closeClockPopover();
+  }
+});
+ 
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape") closeClockPopover();
+});
+
+// Greeting and Date
 // A small personal touch in the start menu header
 const USER_NAME = "Aiden";
 
@@ -250,9 +345,37 @@ function closeStartMenu(){
   resetStartSearch();
 }
 
-// -- Start Menu Toggle 
-startBtn.addEventListener("click", (e) => {
+// Minimizes every open window at once. the taskbar's "Show Desktop" right-click action
+function showDesktop(){
+  state.windows.forEach((win, id) => minimizeWindow(id));
+}
+
+// Shared by the taskbar's "Close All Windows" and the terminal's
+// closeall command so the actual closing logic only lives once
+function closeAllWindows(){
+  const ids = [...state.windows.keys()];
+  ids.forEach((id) => closeWindow(id));
+  return ids.length;
+}
+
+// Right-click on empty taskbar space (not the Start button, not an app button not the tray)
+[taskbarEl, taskbarApps].forEach((el) => {
+  if (!el) return;
+  el.addEventListener("contextmenu", (e) => {
+    if(e.target !== el) return;
+    e.preventDefault();
+    showContextMenu(e.clientX, e.clientY, [
+      { label: "🪟 Show Desktop", onClick: showDesktop },
+      { label: "✖ Close All Windows", onClick: closeAllWindows },
+      { label: "⚙️ Settings", onClick: () => openWindow("settings") },
+    ]);
+  });
+});
+
+// Start Menu Toggle 
+if(startBtn) startBtn.addEventListener("click", (e) => {
   e.stopPropagation();
+  closeClockPopover();
   if(startMenu.classList.contains("hidden")) openStartMenu();
   else closeStartMenu();
 });
@@ -288,9 +411,7 @@ document.getElementById("start-search-input")?.addEventListener("keydown", (e) =
   if(firstTile) firstTile.click();
 });
 
-// global "/" shortcut to jump straight into search, matching the kbd hint
-// shown in the search bar. Skipped while typing in a real input or textarea
-// so it doens't hijack typing a literal "/" in notepad
+// global "/" shortcut to jump straight into search
 
 // Escape closes the menu from anywhere
 document.addEventListener("keydown", (e) => {
@@ -344,6 +465,25 @@ function openWindow(appKey){
   // Focus on click
   win.addEventListener("mousedown", () => focusWindow(id));
 
+  // Right-click -> titlebar gets a real menu
+
+  win.addEventListener("contextmenu", (e) => {
+    if(["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    if(e.target.closest(".window-titlebar")){
+      const isMax = win.classList.contains("maximized");
+      const isPinned = win.dataset.alwaysOnTop === "true";
+      showContextMenu(e.clientX, e.clientY, [
+        { label: "− Minimize", onClick: () => minimizeWindow(id) },
+        { label: isMax ? "□ Restore" : "□ Maximize", onClick: () => toggleMaximize(id) },
+        { label: isPinned ? "📌 Always on Top ✓" : "📌 Always on Top", onClick: () => toggleAlwaysOnTop(id) },
+        { label: "× Close", onClick: () => closeWindow(id) },
+      ]);
+    }
+  });
+
   // Making it draggable and resizable
   makeDraggable(win);
   makeResizable(win);
@@ -366,6 +506,15 @@ function openWindow(appKey){
       focusWindow(id);
     }
   });
+  btn.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const isMin = win.classList.contains("minimized");
+    showContextMenu(e.clientX, e.clientY, [
+      { label: isMin ? "Restore" : "Minimize", onClick: () => (isMin ? restoreWindow(id) : minimizeWindow(id)) },
+      { label: "× Close", onClick: () => closeWindow(id) },
+    ]);
+  });
   taskbarApps.appendChild(btn);
 
   focusWindow(id);
@@ -378,6 +527,7 @@ function openWindow(appKey){
   if(appKey === "terminal") wireTerminal(contentArea);
   if(appKey === "calculator") wireCalculator(contentArea);
   if(appKey === "moodlamp") wireMoodLamp(contentArea);
+  if(appKey === "fortune") wireFortune(contentArea);
 }
 
 function closeWindow(id){
@@ -415,17 +565,39 @@ function restoreWindow(id){
   focusWindow(id);
 }
 
+// Two z-index bands so an "always on top" window can never end up 
+// buried under a normal one just by clicking around
+
+const NORMAL_Z_BASE = 1000;
+const PINNED_Z_BASE = 5000;
+
 function focusWindow(id){
   const win = state.windows.get(id);
   if(!win) return;
+ 
+  const isPinned = win.dataset.alwaysOnTop === "true";
+  const base = isPinned ? PINNED_Z_BASE : NORMAL_Z_BASE;
+  
+  // Exclude the window itself
 
-  const maxZ = Math.max(...Array.from(state.windows.values()).map((w) => parseInt(w.style.zIndex) || 0));
+  const sameBand = Array.from(state.windows.values())
+    .filter((w) => w !== win && (w.dataset.alwaysOnTop === "true") === isPinned);
+  const maxZ = Math.max(base, ...sameBand.map((w) => parseInt(w.style.zIndex) || base));
   win.style.zIndex = maxZ + 1;
   state.activeWindow = win;
-
+ 
   document.querySelectorAll(".taskbar-app").forEach((b) => b.classList.remove("active"));
   const btn = taskbarApps.querySelector(`[data-win-id="${id}"]`);
   if(btn) btn.classList.add("active");
+}
+
+// Right-click-only feature
+
+function toggleAlwaysOnTop(id){
+  const win = state.windows.get(id);
+  if(!win) return;
+  win.dataset.alwaysOnTop = win.dataset.alwaysOnTop === "true" ? "false" : "true";
+  focusWindow(id);
 }
 
 function toggleMaximize(id){
@@ -455,7 +627,7 @@ function makeDraggable(win){
 
     // If this window is currently snapped, "pop" it back to the size it
     // had before snapping, keeping it anchored under the cursor
-    // Dragging a snapped window will feel more natural instead of janky
+
     if(win.dataset.snapped){
       const prevWidth = parseFloat(win.dataset.prevWidth) || 600;
       const prevHeight = parseFloat(win.dataset.prevHeight) || 400;
@@ -547,7 +719,7 @@ function applySnapIfNeeded(win, x, y){
   const zone = getSnapZone(x, y);
   if(!zone) return;
 
-  // Remember the current size so we can restore it if the window
+  // Remember the current size so it can be restored later if the window
   // gets dragged away from the snapped position later
 
   win.dataset.prevWidth = win.offsetWidth;
@@ -622,9 +794,28 @@ function makeResizable(win){
   });
 }
 
-// ----- Desktop Icons -------------------------
+//  Desktop Icons -------------------------
 document.querySelectorAll(".icon[data-app]").forEach((icon) => {
   icon.addEventListener("dblclick", () => openWindow(icon.dataset.app));
+  icon.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showContextMenu(e.clientX, e.clientY, [
+      { label: "Open", onClick: () => openWindow(icon.dataset.app) },
+    ]);
+  });
+});
+
+// Right-click on genuinely empty desktop space (not an icon, not a window)
+if(desktop) desktop.addEventListener("contextmenu", (e) => {
+  if (e.target !== desktop && !e.target.classList.contains("desktop-icons"))
+    return;
+  e.preventDefault();
+  showContextMenu(e.clientX, e.clientY, [
+    { label: "🎨 Personalize", onClick: () => openWindow("settings") },
+    { label: "💻 Open in Terminal", onClick: () => openWindow("terminal") },
+    { label: "🔄 Refresh", onClick: () => location.reload() },
+  ]);
 });
 
 // ----- Start Menu Items ------------------------
@@ -863,7 +1054,7 @@ document.querySelector('[data-action="shutdown"]')?.addEventListener("keydown", 
 
 document.querySelector('[data-action="shutdown"]')?.addEventListener("click", shutdownOS);
 
-// ----- Apps Folder Wiring -----------------
+// ----- Apps Folder Wiring 
 function wireAppsFolder(container){
   container.querySelectorAll(".folder-item[data-app]").forEach((item) => {
     item.addEventListener("dblclick", () => openWindow(item.dataset.app));
@@ -889,7 +1080,7 @@ function wireAppsFolder(container){
   });
 }
 
-// ----- Settings Wiring ---------------------
+//       Settings Wiring 
 function wireSettings(container){
   // The template's markup always starts at hardcoded defaults (OFF, teal, etc.)
   // this overwrites that with whatever's actually in state.settings 
@@ -963,9 +1154,111 @@ function wireNotepad(container){
   });
 }
 
-// Immediate-execution style (like a physical calculator!) 6 + 3 × 2 =
-// evaluates left-to-right, not by operator precedence. Resets fresh
-// every time the window opens, nothing here is persisted on purpose
+//   Fortune Cookie Wiring 
+const FORTUNES = [
+  "A closed mouth gathers no foot.",
+  "The bug you fear most is the one already fixed.",
+  "Someone will laugh at your joke tomorrow.",
+  "A great idea is currently disguised as a bad one.",
+  "Patience is a resource, not a virtue. Spend it wisely.",
+  "You will find what you stopped looking for.",
+  "The next email you send will be read twice.",
+  "Good things come to those who ship.",
+  "A small kindness today compounds by Friday.",
+  "Your best work happens right after you almost gave up.",
+  "The shortest path is rarely the most interesting one.",
+  "Someone is grateful for something you don't remember doing.",
+  "Tonight's rest will solve tomorrow's problem.",
+  "A stranger's advice will be more useful than expected.",
+  "The thing you're avoiding is smaller than you think.",
+  "Your curiosity will open a door someone else walked past.",
+  "Three good decisions are hiding inside one hard one.",
+  "The next question you ask matters more than the last answer.",
+  "You are exactly one conversation away from good news.",
+  "What feels like a delay is actually preparation.",
+  "The plan will change. The direction will not.",
+  "Someone remembers your kindness longer than you do.",
+  "A quiet week precedes a loud one.",
+  "You will fix something without realizing you fixed it.",
+];
+ 
+function wireFortune(container){
+  const cookie = container.querySelector("#fortune-cookie");
+  const hint = container.querySelector("#fortune-hint");
+  const slip = container.querySelector("#fortune-slip");
+  const textEl = container.querySelector("#fortune-text");
+  const numbersEl = container.querySelector("#fortune-numbers");
+  const againBtn = container.querySelector("#fortune-again");
+  if(!cookie || !hint || !slip || !textEl || !numbersEl || !againBtn) return;
+ 
+  let lastIndex = -1;
+ 
+  function pickFortune(){
+    let i;
+    do{
+      i = Math.floor(Math.random() * FORTUNES.length);
+    } while(FORTUNES.length > 1 && i === lastIndex);
+    lastIndex = i;
+    return FORTUNES[i];
+  }
+ 
+  // Real fortune-cookie slips print 6 unique numbers on the back
+  function pickLuckyNumbers(){
+    const pool = Array.from({length: 49}, (_, i) => i + 1);
+    const picked = [];
+    for(let n = 0; n < 6; n++){
+      const idx = Math.floor(Math.random() * pool.length);
+      picked.push(pool.splice(idx, 1)[0]);
+    }
+    return picked.sort((a, b) => a - b);
+  }
+ 
+  function renderSlip(){
+    textEl.textContent = pickFortune();
+    numbersEl.innerHTML = "";
+    pickLuckyNumbers().forEach((n) => {
+      const chip = document.createElement("span");
+      chip.className = "fortune-num";
+      chip.textContent = n;
+      numbersEl.appendChild(chip);
+    });
+  }
+ 
+  function crack(){
+    const isFirstCrack = !cookie.classList.contains("cracked");
+    cookie.classList.add("cracked");
+    hint.classList.add("hidden");
+    againBtn.classList.remove("hidden");
+ 
+    if(isFirstCrack){
+      slip.classList.remove("hidden");
+      renderSlip();
+      requestAnimationFrame(() => slip.classList.add("visible"));
+    } else{
+      // brief fade-out/fade-in so a repeat crack still feels like a
+      // fresh slip instead of the numbers just snapping to new ones
+      slip.classList.remove("visible");
+      setTimeout(() => {
+        renderSlip();
+        slip.classList.add("visible");
+      }, 150);
+    }
+  }
+ 
+  cookie.addEventListener("click", () => {
+    if(!cookie.classList.contains("cracked")) crack();
+  });
+  cookie.addEventListener("keydown", (e) => {
+    if((e.key === "Enter" || e.key === " ") && !cookie.classList.contains("cracked")){
+      e.preventDefault();
+      crack();
+    }
+  });
+  againBtn.addEventListener("click", crack);
+}
+
+// Immediate-execution style (like a physical calculator!)
+// Resets fresh every time the window opens
 function wireCalculator(container){
   const valueEl = container.querySelector("#calc-value");
   const subEl = container.querySelector("#calc-sub");
@@ -1271,9 +1564,8 @@ const TERMINAL_COMMANDS = {
   },
 
   closeall(){
-    const ids = [...state.windows.keys()];
-    ids.forEach((id) => closeWindow(id));
-    return `Closed ${ids.length} window(s).`;
+    const count = closeAllWindows();
+    return `Closed ${count} window(s).`;
   },
   
   shutdown(){
