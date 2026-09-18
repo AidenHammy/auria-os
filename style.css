@@ -979,63 +979,115 @@ html, body{
 }
 
 /* Fortune Cookie */
-.fortune-app{
+.fortune-app {
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   text-align: center;
   padding: 10px;
 }
- 
-.fortune-cookie{
-  font-size: 56px;
+
+.fortune-app::before {
+  content: "What does today hold?";
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.fortune-cookie {
+  position: relative;
+  font-size: 58px;
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.2s ease;
   filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.3));
 }
- 
-.fortune-cookie:hover{
+
+/* A soft shadow pool under the cookie */
+.fortune-cookie::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 34px;
+  height: 7px;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.35), transparent 70%);
+  border-radius: 50%;
+}
+
+.fortune-cookie:hover {
   transform: scale(1.08) rotate(-4deg);
 }
- 
-.fortune-cookie.cracked{
+
+@keyframes fortuneShake {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-10deg);
+  }
+
+  50% {
+    transform: rotate(8deg);
+  }
+
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+.fortune-cookie:not(.cracked):active {
+  animation: fortuneShake 0.22s ease;
+}
+
+.fortune-cookie.cracked {
   cursor: default;
   transform: scale(0.75);
   opacity: 0.4;
 }
- 
-.fortune-cookie.cracked:hover{
+
+.fortune-cookie.cracked:hover {
   transform: scale(0.75);
 }
- 
-.fortune-hint{
+
+.fortune-hint {
   font-size: 11px;
   color: var(--text-dim);
 }
- 
-.fortune-slip{
+
+.fortune-slip {
   position: relative;
   width: 230px;
   max-width: 100%;
   background: var(--paper);
+  background-image: repeating-linear-gradient(135deg,
+      rgba(28, 24, 16, 0.02) 0px,
+      rgba(28, 24, 16, 0.02) 1px,
+      transparent 1px,
+      transparent 5px);
   border: 1px dashed rgba(28, 24, 16, 0.35);
   border-radius: var(--radius);
-  padding: 20px 16px 14px;
+  padding: 20px 16px 16px;
   box-shadow: var(--shadow-sm);
   transform: rotate(-1.4deg);
   opacity: 0;
   transition: opacity 0.25s ease;
 }
- 
-.fortune-slip.visible{
+
+.fortune-slip.visible {
   opacity: 1;
 }
- 
-/* Same punched hole as calendar page */
-.fortune-slip::before{
+
+/* Same punched hole as the calendar page */
+.fortune-slip::before {
   content: "";
   position: absolute;
   top: 8px;
@@ -1046,21 +1098,33 @@ html, body{
   background: var(--bg);
   border: 1px solid rgba(28, 24, 16, 0.35);
 }
- 
-.fortune-slip-text{
+
+.fortune-slip::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 13px 13px;
+  border-color: transparent transparent rgba(28, 24, 16, 0.16) transparent;
+}
+
+.fortune-slip-text {
   font-family: var(--font-display);
   font-style: italic;
   font-size: 14px;
   line-height: 1.55;
   color: #1c1810;
 }
- 
-.fortune-slip-divider{
+
+.fortune-slip-divider {
   border-top: 1px dashed rgba(28, 24, 16, 0.3);
   margin: 12px 0 10px;
 }
- 
-.fortune-slip-numbers-label{
+
+.fortune-slip-numbers-label {
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 700;
@@ -1069,19 +1133,20 @@ html, body{
   color: rgba(28, 24, 16, 0.5);
   margin-bottom: 7px;
 }
- 
-.fortune-slip-numbers{
+
+.fortune-slip-numbers {
   display: flex;
   justify-content: center;
   gap: 6px;
 }
- 
-.fortune-num{
+
+.fortune-num {
   width: 22px;
   height: 22px;
   min-width: 22px;
   border-radius: 50%;
   border: 1px solid rgba(28, 24, 16, 0.35);
+  background: rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1089,10 +1154,16 @@ html, body{
   font-size: 10px;
   font-weight: 700;
   color: #1c1810;
+  transition: transform 0.15s ease;
 }
- 
-.fortune-again{
-  padding: 6px 14px;
+
+.fortune-num:hover {
+  transform: translateY(-2px);
+}
+
+.fortune-again {
+  position: relative;
+  padding: 6px 14px 6px 26px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-strong);
   background: var(--bg-light);
@@ -1102,8 +1173,17 @@ html, body{
   cursor: pointer;
   transition: var(--transition);
 }
- 
-.fortune-again:hover{
+
+.fortune-again::before {
+  content: "🥠";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+}
+
+.fortune-again:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
