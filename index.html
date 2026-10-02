@@ -135,11 +135,16 @@
 	<!-- Browser -->
 	<template id="content-browser">
 		<div class="browser-app">
-			<div style="padding: 40px; text-align: center; color: var(--text-dim)">
-				🌐 Browser will go here <br>
-				<input type="text" placeholder="https://..." style="margin-top: 20px; padding: 8px 16px; width: 300px;
-				border-radius: 3px; border: 1px solid var(--border); background: var(--bg-light); color: var(--text)">
+			<div class="browser-toolbar">
+				<button class="browser-btn" data-nav="back" title="Back">←</button>
+				<button class="browser-btn" data-nav="forward" title="Forward">→</button>
+				<button class="browser-btn" data-nav="reload" title="Reload">⟳</button>
+				<button class="browser-btn" data-nav="home" title="Home">⌂</button>
+				<input type="text" class="browser-url" placeholder="Search or enter address" autocomplete="off">
+				<button class="browser-go" data-nav="go">Go</button>
 			</div>
+			<iframe class="browser-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+			<div class="browser-toast" id="browser-toast"></div>
 		</div>
 	</template>
 

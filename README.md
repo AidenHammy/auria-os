@@ -1,6 +1,6 @@
 # AuriaOS
 
-A browser-based webOS built from scratch with vanilla HTML, CSS and JavaScript. No frameworks, no build step, just a desktop in a browser tab!
+A browser-based webOS built from scratch with vanilla HTML, CSS and JavaScript. No frameworks, no build step, it's just a desktop in a browser tab!
 
 This is a personal learning project built as part of **Stardance**, hosted by Hack Club.
 
@@ -16,20 +16,25 @@ This is a personal learning project built as part of **Stardance**, hosted by Ha
   - Drag to the top to maximize
 - Double-click a titlebar to maximize or restore
 - Proper window focus and z-index management
+- Right-click a titlebar for a real context menu: Minimize, Maximize/Restore, Always on Top, Close
+- **Always on Top** - pin a window and it stays above every other window no matter what else you click, using its own dedicated z-index band
+- Right-click a taskbar button to restore/minimize or close that window directly
 
 ### Desktop
 - Desktop icons with double-click launching
-- Live desktop clock
+- Right-click a desktop icon for a quick Open
+- Right-click empty desktop space for Personalize, Open in Terminal and Refresh. A real OS-style desktop menu conventions but it's not a restated app launcher
+- Live desktop clock that's actually interactive! Click it to open a calendar popover for the current month with today marked and correct handling of month length and leap years
 - Window state synchronized with the taskbar
 
 ### Start Menu
-- Search across the full app catalog instantly not just pinned apps
+- Search across the full app catalog instantly and not just pinned apps
 - Pin/unpin apps via right-click with a real context menu
 - Five core apps are locked as always-pinned so the menu can never end up empty
 - Pinned apps grid with a colored icon badge for every app
-- Recent section; tracking apps you've actually opened (real activity not placeholder data)
+- Recent section which includes tracking apps you've actually opened
 - "Show all" link straight into the Apps folder
-- Quick toggles for Dark Mode, Sound, Wi-Fi and Bluetooth; Dark Mode and Sound are real saved settings shared with the Settings panel; Wi-Fi/Bluetooth are visual only since a browser tab has no actual hardware to control
+- Quick toggles for Dark Mode, Sound, Wi-Fi and Bluetooth. Dark Mode and Sound are real saved settings shared with the Settings panel, although I haven't worked on sound just yet. Wi-Fi/Bluetooth are visual only.
 - Personal greeting header with a time-aware message and the current date
 - User profile footer
 - Full keyboard support! Tab between items, Enter or Space to activate, Escape to close, Enter in search opens the top result
@@ -39,7 +44,11 @@ This is a personal learning project built as part of **Stardance**, hosted by Ha
 - Live taskbar buttons for every open window
 - Active/minimized state indicators
 - Click a taskbar button to focus or minimize its window
+- Right-click empty taskbar space for Show Desktop, Close All Windows and Settings
 - System tray icons mirror current Wi-Fi and Sound state
+
+### Right-Click Everywhere
+Context menus aren't limited to one corner of the OS. Right-clicking does something real in every part of the desktop: titlebars, taskbar buttons, empty taskbar space, empty desktop space and desktop icons each get their own menu built for that specific context, reusing one shared context-menu system under the hood.
 
 ### Settings
 - Dark mode toggle
@@ -53,6 +62,7 @@ This is a personal learning project built as part of **Stardance**, hosted by Ha
 Using `localStorage`, AuriaOS remembers:
 - Theme & settings
 - Accent color
+- Ambient light (Mood Lamp) color and intensity
 - Notepad contents
 - Pinned applications
 - Recently opened applications
@@ -60,36 +70,19 @@ Using `localStorage`, AuriaOS remembers:
 ## Apps
 
 **Working**
-- Notepad autosaves while typing, persists via `localStorage`
-- Terminal is a real shell; command parsing, arrow-key history and commands that actually control the OS, not just printed text. `open`, `pin`/`unpin`, `theme`, `darkmode`, `sound`, `wifi`, `bluetooth`, `ls`, `history`, `closeall` and `shutdown` all do exactly what they say
-
-**In Progress**
-- Browser
-- Calculator
-- Mood Lamp
-- Fortune Cookie
+- **Notepad** : autosaves while typing, persists via `localStorage`
+- **Terminal** : a real shell with command parsing, arrow-key history and commands that actually control the OS. `open`, `pin`/`unpin`, `theme`, `lightmode`, `sound`, `wifi`, `bluetooth`, `ls`, `history`, `closeall` and `shutdown` all do exactly what they say
+- **Calculator** : immediate-execution arithmetic (the way a real desk calculator works), full keyboard input, proper divide by zero handling
+- **Mood Lamp** : an ambient color wash applied across the whole desktop with four presets plus a full custom color picker and intensity control
+- **Fortune Cookie** : click to crack, reveals a real paper slip with one of 24 written fortunes and six unique "lucky numbers" the same way an actual fortune-cookie slip works
+- **Browser** : a real address bar with back/forward/reload/home, loading pages in an embedded view. Typed searches open in a new tab instead since search engines universally block being shown inside another page's frame. Well good thing is direct URLs still load inline where the target site allows it
 
 ## Tech Stack
 
 - HTML
 - CSS
-- Vanilla JavaScript
-- LocalStorage API
-
-No frameworks. No libraries. No dependencies. No build tools.
-
-## Roadmap
-
-Planned additions include:
-- Browser with real navigation support
-- Calculator implementation
-- More desktop applications
-- A simulated file system
-- Notifications
-- Persisting terminal command history across reloads, not just per-window
-- Broader keyboard accessibility beyond the start menu
-- More keyboard shortcuts
-- Performance improvements
+- JavaScript
+- LocalStorage 
 
 ## Contributing
 

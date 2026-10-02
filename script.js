@@ -528,6 +528,7 @@ function openWindow(appKey){
   if(appKey === "calculator") wireCalculator(contentArea);
   if(appKey === "moodlamp") wireMoodLamp(contentArea);
   if(appKey === "fortune") wireFortune(contentArea);
+  if(appKey === "browser") wireBrowser(contentArea);
 }
 
 function closeWindow(id){
@@ -1152,6 +1153,140 @@ function wireNotepad(container){
       console.warn("Couldn't save notes.", err);
     }
   });
+}
+
+// Browser wiring
+const BROWSER_HOME_SRCDOC = `<!DOCTYPE html><html><head><style>
+  body{margin:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#17140f;color:#ece4d2;font-family:'JetBrains Mono',monospace;text-align:center;padding:24px;box-sizing:border-box}
+  h1{font-size:18px;margin:0 0 10px}
+  p{font-size:12px;color:#9a8f79;max-width:320px;line-height:1.6;margin:0}
+  </style></head><body>
+  <h1>🌐 AuriaOS Browser</h1>
+  <p>Type a web address to load it here. A plain search opens in a new tab instead since search engines block being shown
+    inside another page but oh well some regular sites do too.
+  </p>
+  </body></html>`;
+
+const EMBED_BLOCKLIST = [
+  "roblox.com",
+  "linkedin.com",
+  "facebook.com",
+  "instagram.com",
+  "twitter.com",
+  "x.com",
+  "google.com",
+  "youtube.com",
+  "accounts.google.com",
+  "github.com",
+  "reddit.com",
+];
+
+function isLikelyBlocked(url){
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return EMBED_BLOCKLIST.some(d => host === d || host.endsWith("." + d));
+  } catch { return false; }
+}
+
+function wireBrowser(container){
+  const urlInput = container.querySelector(".browser-url");
+  const iframe = container.querySelector(".browser-frame");
+  const toastEl = container.querySelector("#browser-toast");
+
+  if(!urlInput || !iframe) return;
+
+  let toastTimeout = null;
+  let loadTimeout = null;
+
+  function showToast(msg){
+    if(!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.add("visible");
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toastEl.classList.remove("visible"), 2800);
+  }
+
+  function goHome(){
+    if(loadTimeout){ clearTimeout(loadTimeout); loadTimeout = null; }
+    iframe.removeAttribute("src");
+    iframe.srcdoc = BROWSER_HOME_SRCDOC;
+    urlInput.value = "";
+  }
+
+  function loadUrl(url){
+    if(isLikelyBlocked(url)){
+      const ok = window.open(url, "_blank", "noopener,noreferrer");
+      if(ok){
+        urlInput.value = "";
+        showToast("Can't be embedded, opened in new tab");
+      } else {
+        showToast("Pop-up blocked, allow pop-ups for this site");
+      }
+      return;
+    }
+
+    if(loadTimeout){ clearTimeout(loadTimeout); loadTimeout = null; }
+
+    iframe.removeAttribute("srcdoc");
+    iframe.src = url;
+    urlInput.value = url;
+
+    let loaded = false;
+    loadTimeout = setTimeout(() => {
+      if(!loaded){
+        iframe.src = "about:blank";
+        iframe.srcdoc = BROWSER_HOME_SRCDOC;
+        urlInput.value = "";
+        const ok = window.open(url, "_blank", "noopener,noreferrer");
+        showToast(ok ? "Embed failed, opened in new tab" : "Embed failed and pop-up blocked");
+      }
+    }, 4000);
+
+    iframe.onload = () => {
+      loaded = true;
+      if(loadTimeout){ clearTimeout(loadTimeout); loadTimeout = null; }
+    };
+  }
+
+  function navigate(raw){
+    const trimmed = raw.trim();
+    if(!trimmed){ goHome(); return; }
+
+    if(/^https?:\/\//i.test(trimmed)) {
+      loadUrl(trimmed);
+    } else if(/^\S+\.\S+$/.test(trimmed)) {
+      loadUrl("https://" + trimmed);
+    } else {
+      const searchUrl = "https://duckduckgo.com/?q=" + encodeURIComponent(trimmed);
+      window.open(searchUrl, "_blank", "noopener,noreferrer");
+      urlInput.value = "";
+      showToast("Opened search in a new tab");
+    }
+  }
+
+  container.querySelector('[data-nav="back"]')?.addEventListener("click", () => {
+    try{ iframe.contentWindow.history.back(); } catch(err){}
+  });
+
+  container.querySelector('[data-nav="forward"]')?.addEventListener("click", () => {
+    try{ iframe.contentWindow.history.forward(); } catch(err){}
+  });
+
+  container.querySelector('[data-nav="reload"]')?.addEventListener("click", () => {
+    if(iframe.getAttribute("src")) iframe.src = iframe.src;
+    else iframe.srcdoc = BROWSER_HOME_SRCDOC;
+  });
+
+  container.querySelector('[data-nav="home"]')?.addEventListener("click", goHome);
+
+  container.querySelector('[data-nav="go"]')?.addEventListener("click", () => navigate(urlInput.value));
+
+  urlInput.addEventListener("keydown", (e) => {
+    if(e.key === "Enter") navigate(urlInput.value);
+  });
+
+  goHome();
 }
 
 //   Fortune Cookie Wiring 
