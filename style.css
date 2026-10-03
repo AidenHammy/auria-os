@@ -13,23 +13,23 @@
   --taskbar-bg: #1a160f;
   --border: rgba(236, 228, 210, 0.10);
   --border-strong: rgba(236, 229, 211, 0.20);
-  --radius-sm: 2px;
-  --radius: 3px;
-  --radius-lg: 5px;
+  --radius-sm: 1px;
+  --radius: 4px;
+  --radius-lg: 8px;
   --shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
   --shadow-sm: 2px 2px 0 rgba(0, 0, 0, 0.35);
   --transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
   --font-display: 'Fraunces', Georgia, serif;
   --font-mono: 'JetBrains Mono', 'Cascadia Code', ui-monospace, monospace;
-  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
 }
 
 html, body{
@@ -77,6 +77,22 @@ html, body{
   z-index: 1;
 }
 
+.icon:nth-child(1) {
+  margin-bottom: 6px;
+}
+
+.icon:nth-child(2) {
+  margin-bottom: 16px;
+}
+
+.icon:nth-child(3) {
+  margin-bottom: 4px;
+}
+
+.icon:nth-child(4) {
+  margin-bottom: 12px;
+}
+
 .icon{
   width: 80px;
   padding: 10px 4px;
@@ -93,6 +109,7 @@ html, body{
 .icon:hover{
   background: rgba(236, 228, 210, 0.05);
   border-color: var(--border-strong);
+  transform: rotate(-0.1deg) scale(1.03);
 }
 
 .icon:active{
@@ -222,7 +239,7 @@ html, body{
   border: 1px solid var(--border-strong);
   background: transparent;
   cursor: pointer;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 12px;
   line-height: 1;
   display: flex;
@@ -495,6 +512,7 @@ html, body{
   align-items: center;
   justify-content: center;
   font-size: 16px;
+  transform: rotate(0.1deg);
 }
 
 .start-greeting-text {
@@ -513,7 +531,7 @@ html, body{
   font-size: 11px;
   color: var(--text-dim);
   margin-top: 3px;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
 }
 
 .start-greeting-date {
@@ -522,7 +540,7 @@ html, body{
   text-align: right;
   line-height: 1.5;
   white-space: nowrap;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
 }
 
 
@@ -549,7 +567,7 @@ html, body{
   outline: none;
   color: var(--text);
   font-size: 12px;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
 }
 
 .start-search input::placeholder {
@@ -558,7 +576,7 @@ html, body{
 
 .start-search-kbd {
   font-size: 10px;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   color: var(--text-dim);
   background: var(--bg-lighter);
   border: 1px solid var(--border-strong);
@@ -919,7 +937,7 @@ html, body{
 .folder-label {
   font-size: 11px;
   color: var(--text-dim);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
 }
 
 /* Terminal */
@@ -997,7 +1015,7 @@ html, body{
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 6px 12px;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 11px;
   color: var(--text);
   box-shadow: var(--shadow-sm);
@@ -1031,7 +1049,7 @@ html, body{
   border: 1px solid var(--border-strong);
   background: var(--bg-light);
   color: var(--text-dim);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 13px;
   cursor: pointer;
   transition: var(--transition);
@@ -1054,7 +1072,7 @@ html, body{
   border: 1px solid var(--border-strong);
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 12px;
   outline: none;
   
@@ -1071,7 +1089,7 @@ html, body{
   border: 1px solid var(--accent);
   background: var(--accent);
   color: #1c1810;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -1237,7 +1255,7 @@ html, body{
 }
 
 .fortune-slip-numbers-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1262,7 +1280,7 @@ html, body{
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 10px;
   font-weight: 700;
   color: #1c1810;
@@ -1280,7 +1298,7 @@ html, body{
   border: 1px solid var(--border-strong);
   background: var(--bg-light);
   color: var(--text);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 11px;
   cursor: pointer;
   transition: var(--transition);
@@ -1350,7 +1368,7 @@ html, body{
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   color: var(--text);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -1399,6 +1417,7 @@ html, body{
 /* Mood Lamp */
 
 .moodlamp-app {
+  padding: 2px 11px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1479,7 +1498,7 @@ html, body{
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   color: var(--text-dim);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -1604,7 +1623,7 @@ html, body{
 }
  
 .clock-popover-weekday {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -1623,7 +1642,7 @@ html, body{
 }
  
 .clock-popover-month {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 11px;
   color: var(--text-dim);
 }

@@ -440,8 +440,8 @@ function openWindow(appKey){
 
   win.dataset.id = id;
   win.dataset.app = appKey;
-  win.style.left = 50 + ((id * 30) % 200) + "px";
-  win.style.top = 30 + ((id * 30) % 150) + "px";
+  win.style.left = 40 + ((id * 47) % 220) + "px";
+  win.style.top = 25 + ((id * 31) % 120) + "px";
   win.style.zIndex = 1000 + id;
 
   // Setting title
@@ -843,7 +843,7 @@ function buildStartMenu(query=""){
   if(entries.length === 0){
     const empty = document.createElement("div");
     empty.className = "start-grid-empty";
-    empty.textContent = "No apps found";
+    empty.textContent = "No matches";
     grid.appendChild(empty);
     return;
   }
@@ -1041,7 +1041,7 @@ function shutdownOS(){
   startMenu.classList.add("hidden");
   document.body.innerHTML = 
   `<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #000; color: #fff;
-   font-size: 24px">Shutting down...</div>`;
+   font-size: 24px">Shutting down. Be right back.</div>`;
   
   setTimeout(() => location.reload(), 5000);
 }
@@ -1156,17 +1156,47 @@ function wireNotepad(container){
 }
 
 // Browser wiring
-const BROWSER_HOME_SRCDOC = `<!DOCTYPE html><html><head><style>
-  body{margin:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:#17140f;color:#ece4d2;font-family:'JetBrains Mono',monospace;text-align:center;padding:24px;box-sizing:border-box}
-  h1{font-size:18px;margin:0 0 10px}
-  p{font-size:12px;color:#9a8f79;max-width:320px;line-height:1.6;margin:0}
-  </style></head><body>
-  <h1>🌐 AuriaOS Browser</h1>
-  <p>Type a web address to load it here. A plain search opens in a new tab instead since search engines block being shown
-    inside another page but oh well some regular sites do too.
-  </p>
-  </body></html>`;
+const BROWSER_HOME_SRCDOC = `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <style>
+        body{
+          margin: 0;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: #17140f; 
+          color: #ece4d2;
+          font-family: 'Plus Jakarta Sans',system-ui,sans-serif;
+          text-align: center;
+          padding: 24px; 
+          box-sizing: border-box
+        }
+
+        h1{
+          font-size: 18px;
+          margin: 0 0 10px
+        }
+        p {
+          font-size: 12px;
+          color: #9a8f79;
+          max-width: 320px;
+          line-height: 1.6;
+          margin:0
+        }
+      </style>
+    </head>
+    <body>
+      <h1>🌐 Browser</h1>
+      <p>Type a web address to load it here. A plain search opens in a new tab instead since search engines block being shown
+        inside another page but oh well some regular sites do too.
+      </p>
+    </body>
+  </html>
+`;
 
 const EMBED_BLOCKLIST = [
   "roblox.com",
@@ -1804,7 +1834,7 @@ function wireTerminal(container){
     if(window.getSelection().toString() === "") input.focus();
   });
 
-  printLine("AuriaOS Terminal - type 'help' to see available commands.");
+  printLine("auriaos terminal. type 'help' if you get stuck.");
   input.focus();
 }
 
