@@ -1,6 +1,4 @@
-//                Persistence
-// Settings and notepad text survive a refresh via localStorage
-// Window positions/open apps are NOT persisted yet
+// persistence
 
 const STORAGE_KEYS = {
   settings: "auriaos-settings",
@@ -25,8 +23,6 @@ const DEFAULT_SETTINGS = {
 function loadSettings(){
   try{
     const saved = localStorage.getItem(STORAGE_KEYS.settings);
-    // Merging over the defaults rather than replacing them outright ensures that upon adding
-    // a new setting in a future version, old data won't leave it as undefined
     return saved ? {...DEFAULT_SETTINGS, ...JSON.parse(saved)} : {...DEFAULT_SETTINGS};
   } catch(err){
     console.warn("Couldn't load saved settings using defaults.", err);
@@ -42,19 +38,12 @@ function saveSettings(){
   }
 }
 
-// Apply settings to the actual page. Needed both at startup and whenever
-// a setting changes, so it is its own function instead of being repeated
-
 function applySettings(){
   document.body.style.filter = state.settings.darkmode ? "invert(1) hue-rotate(180deg)" : "";
   document.documentElement.style.setProperty("--accent", state.settings.accent);
   document.documentElement.style.setProperty("--accent-hover", state.settings.accent);
   document.documentElement.classList.toggle("no-animations", !state.settings.animations);
 }
-
-// Separate from applySettings() since it targets one
-// specific element rather than the whole document but follows the same
-// "call at startup + call on every change" pattern
 
 function applyMoodLamp(){
   const overlay = document.getElementById("mood-overlay");
@@ -64,8 +53,6 @@ function applyMoodLamp(){
   overlay.classList.toggle("active", state.settings.moodOn);
 }
 
-// Locked apps are always pinned no matter what's saved
-// it will guarantee the start menu never ends up empty
 function loadPinnedApps(){
   const lockedKeys = Object.keys(apps).filter((key) => apps[key].locked);
   try{
@@ -80,8 +67,6 @@ function loadPinnedApps(){
 
 function savePinnedApps(){
   try{
-    // Only the custom (non-locked) pins need saving
-    // locked ones get re-added automatically on load regardless
     const customPins = [...state.pinnedApps].filter((key) => !apps[key]?.locked);
     localStorage.setItem(STORAGE_KEYS.pinned, JSON.stringify(customPins));
   } catch(err){
@@ -89,8 +74,7 @@ function savePinnedApps(){
   }
 }
 
-//  Recent Apps 
-// Tracks apps that've actually been opened WITH a real timestamp
+// recent apps 
 
 const MAX_RECENT = 5;
 
@@ -112,8 +96,6 @@ function saveRecentApps(){
   }
 }
 
-// Moves or adds an app to the front of the recent list, capped at
-// MAX_RECENT entries. Called every time a window actually opens
 function trackRecentApp(key){
   state.recentApps = state.recentApps.filter((entry) => entry.key !== key);
   state.recentApps.unshift({key, timestamp: Date.now()});
@@ -133,7 +115,7 @@ function formatRelativeTime(timestamp){
   return `${diffDay}d ago`;
 }
 
-// State 
+// state 
 const state = {
   windows: new Map(),
   nextId: 1,
@@ -146,7 +128,7 @@ const state = {
 applySettings();
 applyMoodLamp();
 
-// DOM refs 
+// dom refs 
 const desktop = document.getElementById("desktop");
 const windowLayer = document.getElementById("window-layer");
 const taskbarApps = document.getElementById("taskbar-apps");
@@ -156,7 +138,7 @@ const clockEl = document.getElementById("clock");
 const taskbarEl = document.getElementById("taskbar");
 const clockPopover = document.getElementById("clock-popover");
 
-// App definitions 
+// app registry
 const apps = {
   browser: { title: "Browser", icon: "🌐", template: "content-browser", badge: "#6a8caf" },
   terminal: { title: "Terminal", icon: "💻", template: "content-terminal", locked: true, badge: "#2c2519" },
@@ -170,9 +152,7 @@ const apps = {
 
 state.pinnedApps = loadPinnedApps();
 
-// Toggles whether an app shows up in the start menu
-// Locked apps silently refuse. The context menu never even offers this 
-// option for them but the check stays here too as a safety net
+// locked apps can't be unpinned
 
 function togglePinned(key){
   if(apps[key]?.locked) return;
@@ -186,7 +166,7 @@ function togglePinned(key){
   buildStartMenu(currentQuery);
 }
 
-//  Clock 
+// clock 
 function updateClock() {
   if (!clockEl) return; // Safety net!
   const now = new Date();
@@ -195,7 +175,7 @@ function updateClock() {
     minute: "2-digit",
   });
   
-  // If the calendar is open, keep it updated in real-time
+  // live-update calendar if open
   
   if (clockPopover && !clockPopover.classList.contains("hidden")) {
     buildClockCalendar();
@@ -231,11 +211,11 @@ function buildClockCalendar(){
   const month = now.getMonth();
   const today = now.getDate();
  
-  const startOffset = new Date(year, month, 1).getDay(); // 0 = Sunday
+  const startOffset = new Date(year, month, 1).getDay(); // 0 = sunday
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPrevMonth = new Date(year, month, 0).getDate();
  
-  // Faded leading days from the previous month
+  // leading + trailing days to fill the grid
   for(let i = startOffset - 1; i >= 0; i--){
     const cell = document.createElement("div");
     cell.className = "clock-cal-day other-month";
@@ -249,8 +229,7 @@ function buildClockCalendar(){
     cell.textContent = d;
     calEl.appendChild(cell);
   }
- 
-  // Faded trailing days so the grid always ends on a full week
+
   const trailing = (7 - ((startOffset + daysInMonth) % 7)) % 7;
   for(let d = 1; d <= trailing; d++){
     const cell = document.createElement("div");
@@ -291,8 +270,7 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "Escape") closeClockPopover();
 });
 
-// Greeting and Date
-// A small personal touch in the start menu header
+// greeting
 const USER_NAME = "Aiden";
 
 const profileNameEl = document.getElementById("start-profile-name");
@@ -309,7 +287,7 @@ function updateGreeting(){
   else greeting = "Good evening";
 
   const greetingE1 = document.getElementById("start-greeting-sub");
-  if(greetingE1) greetingE1.textContent = `${greeting}, ${USER_NAME}.`;
+  if(greetingE1) greetingE1.textContent = `${greeting}, ${USER_NAME}`;
 
   const dateE1 = document.getElementById("start-greeting-date");
   if(dateE1){
@@ -321,17 +299,16 @@ function updateGreeting(){
 
 updateGreeting();
 
-// Clears the search box and rebuilds the grid back to the pinned-only view
-// Called anywhere the menu closes so it doesn't reopen later still showing
-// whatever you last searched for
+// reset search on close
+
 function resetStartSearch(){
   const input = document.getElementById("start-search-input");
   if(input) input.value = "";
   buildStartMenu();
 }
 
-// Shared so both the Start button and the "/" shortcut behave identically
-// instead of having two slightly different versions of opening the menu
+// shared open logic
+
 function openStartMenu(){
   startMenu.classList.remove("hidden");
   updateGreeting();
@@ -345,20 +322,19 @@ function closeStartMenu(){
   resetStartSearch();
 }
 
-// Minimizes every open window at once. the taskbar's "Show Desktop" right-click action
+// show desktop
 function showDesktop(){
   state.windows.forEach((win, id) => minimizeWindow(id));
 }
 
-// Shared by the taskbar's "Close All Windows" and the terminal's
-// closeall command so the actual closing logic only lives once
+// shared by taskbar + terminal
 function closeAllWindows(){
   const ids = [...state.windows.keys()];
   ids.forEach((id) => closeWindow(id));
   return ids.length;
 }
 
-// Right-click on empty taskbar space (not the Start button, not an app button not the tray)
+// right-click empty taskbar
 [taskbarEl, taskbarApps].forEach((el) => {
   if (!el) return;
   el.addEventListener("contextmenu", (e) => {
@@ -372,7 +348,7 @@ function closeAllWindows(){
   });
 });
 
-// Start Menu Toggle 
+// start menu
 if(startBtn) startBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   closeClockPopover();
@@ -403,17 +379,14 @@ document.getElementById("start-show-all")?.addEventListener("keydown", (e) => {
   }
 });
 
-// Pressing Enter opens the first search result
-// Otherwise, search only filters the list
+// enter opens first result
 document.getElementById("start-search-input")?.addEventListener("keydown", (e) => {
   if(e.key !== "Enter") return;
   const firstTile = document.querySelector(".start-grid .start-app");
   if(firstTile) firstTile.click();
 });
 
-// global "/" shortcut to jump straight into search
-
-// Escape closes the menu from anywhere
+// "/" focuses search, esc closes
 document.addEventListener("keydown", (e) => {
   if(e.key === "Escape" && !startMenu.classList.contains("hidden")){
     closeStartMenu();
@@ -427,7 +400,7 @@ document.addEventListener("keydown", (e) => {
   else document.getElementById("start-search-input")?.focus();
 });
 
-//Open Window 
+// window management
 function openWindow(appKey){
   const app = apps[appKey];
   if(!app) return;
@@ -444,10 +417,8 @@ function openWindow(appKey){
   win.style.top = 25 + ((id * 31) % 120) + "px";
   win.style.zIndex = 1000 + id;
 
-  // Setting title
   win.querySelector(".window-title").textContent = app.icon + " " + app.title;
 
-  // Setting content
   const contentArea = win.querySelector(".window-content");
   if(app.template){
     const tmpl = document.getElementById(app.template);
@@ -457,12 +428,10 @@ function openWindow(appKey){
     contentArea.innerHTML = app.content;
   }
 
-  // Window controls
   win.querySelector(".close").addEventListener("click", () => closeWindow(id));
   win.querySelector(".minimize").addEventListener("click", () => minimizeWindow(id));
   win.querySelector(".maximize").addEventListener("click", () => toggleMaximize(id));
 
-  // Focus on click
   win.addEventListener("mousedown", () => focusWindow(id));
 
   // Right-click -> titlebar gets a real menu
@@ -488,11 +457,9 @@ function openWindow(appKey){
   makeDraggable(win);
   makeResizable(win);
 
-  // Adding to layer
   windowLayer.appendChild(win);
   state.windows.set(id, win);
 
-  // Adding taskbar button
   const btn = document.createElement("div");
   btn.className = "taskbar-app";
   btn.dataset.winId = id;
@@ -520,7 +487,6 @@ function openWindow(appKey){
   focusWindow(id);
   startMenu.classList.add("hidden");
 
-  // Wiring up app-specific interactions
   if(appKey === "apps") wireAppsFolder(contentArea);
   if(appKey === "settings") wireSettings(contentArea);
   if(appKey === "notepad") wireNotepad(contentArea);
@@ -566,8 +532,7 @@ function restoreWindow(id){
   focusWindow(id);
 }
 
-// Two z-index bands so an "always on top" window can never end up 
-// buried under a normal one just by clicking around
+// two z-index bands: pinned windows stay above normal ones
 
 const NORMAL_Z_BASE = 1000;
 const PINNED_Z_BASE = 5000;
@@ -578,8 +543,6 @@ function focusWindow(id){
  
   const isPinned = win.dataset.alwaysOnTop === "true";
   const base = isPinned ? PINNED_Z_BASE : NORMAL_Z_BASE;
-  
-  // Exclude the window itself
 
   const sameBand = Array.from(state.windows.values())
     .filter((w) => w !== win && (w.dataset.alwaysOnTop === "true") === isPinned);
@@ -626,8 +589,7 @@ function makeDraggable(win){
     win.style.transition = "none";
     focusWindow(parseInt(win.dataset.id));
 
-    // If this window is currently snapped, "pop" it back to the size it
-    // had before snapping, keeping it anchored under the cursor
+    // un-snap on drag, keep under cursor
 
     if(win.dataset.snapped){
       const prevWidth = parseFloat(win.dataset.prevWidth) || 600;
@@ -647,7 +609,7 @@ function makeDraggable(win){
     startTop = win.offsetTop;
   });
 
-  // Double-click the titlebar to maximise/restore.
+  // dblclick to toggle maximize
   titlebar.addEventListener("dblclick", (e) => {
     if(e.target.closest(".window-controls")) return;
     toggleMaximize(parseInt(win.dataset.id));
@@ -720,8 +682,7 @@ function applySnapIfNeeded(win, x, y){
   const zone = getSnapZone(x, y);
   if(!zone) return;
 
-  // Remember the current size so it can be restored later if the window
-  // gets dragged away from the snapped position later
+  // save pre-snap size
 
   win.dataset.prevWidth = win.offsetWidth;
   win.dataset.prevHeight = win.offsetHeight;
@@ -734,7 +695,7 @@ function applySnapIfNeeded(win, x, y){
   win.dataset.snapped = zone;
 }
 
-// ----------- Resizing ---------------
+// resize
 function makeResizable(win){
   const minWidth = 280;
   const minHeight = 180;
@@ -742,7 +703,7 @@ function makeResizable(win){
   win.querySelectorAll(".resize-handle").forEach((handle) => {
     handle.addEventListener("mousedown", (e) => {
       if(win.classList.contains("maximized")) return;
-      e.stopPropagation(); // doesn't let it bubble up and start a drag
+      e.stopPropagation();
       e.preventDefault();
 
       const dir = handle.dataset.dir;
@@ -755,7 +716,7 @@ function makeResizable(win){
 
       win.style.transition = "none";
       focusWindow(parseInt(win.dataset.id));
-      delete win.dataset.snapped; // resizing manually un-snaps it
+      delete win.dataset.snapped;
 
       function onMove(e){
         const dx = e.clientX - startX;
@@ -795,7 +756,7 @@ function makeResizable(win){
   });
 }
 
-//  Desktop Icons -------------------------
+// desktop icons
 document.querySelectorAll(".icon[data-app]").forEach((icon) => {
   icon.addEventListener("dblclick", () => openWindow(icon.dataset.app));
   icon.addEventListener("contextmenu", (e) => {
@@ -807,7 +768,7 @@ document.querySelectorAll(".icon[data-app]").forEach((icon) => {
   });
 });
 
-// Right-click on genuinely empty desktop space (not an icon, not a window)
+// right-click empty desktop
 if(desktop) desktop.addEventListener("contextmenu", (e) => {
   if (e.target !== desktop && !e.target.classList.contains("desktop-icons"))
     return;
@@ -819,10 +780,7 @@ if(desktop) desktop.addEventListener("contextmenu", (e) => {
   ]);
 });
 
-// ----- Start Menu Items ------------------------
-// Builds the start menu's tiles from state.pinnedApps (or with an active
-// search query, the full apps catalog). Re-run on every keystroke and
-// every pin/unpin so it clears the grid first to avoid duplicating tiles
+// start menu grid
 
 function buildStartMenu(query=""){
   const grid = document.querySelector(".start-grid");
@@ -832,8 +790,7 @@ function buildStartMenu(query=""){
 
   const trimmed = query.trim().toLowerCase();
 
-  // No search text: show only the pinned apps like a normal start menu
-  // With search text: search the FULL catalog not just the pinned ones
+  // no query = pinned only, query = full catalog
 
   const entries = trimmed
   ? Object.entries(apps).filter(([, app]) => app.title.toLowerCase().includes(trimmed))
@@ -882,7 +839,6 @@ function buildStartMenu(query=""){
           { label: "📌 Always pinned", disabled: true },
         ]);
       } else{
-        // A search result might not be pinned at all
         const isPinned = state.pinnedApps.has(key);
         showContextMenu(e.clientX, e.clientY, [
           {label: isPinned? "📌 Unpin from Start" : "📌 Pin to Start", onClick: () => togglePinned(key)},
@@ -896,7 +852,7 @@ function buildStartMenu(query=""){
 
 buildStartMenu();
 
-// Recent apps, built from from real activity tracked in openWindow() not invented data
+// recent apps
 function buildRecentList(){
   const list = document.querySelector(".start-recent-list");
   if(!list) return;
@@ -913,7 +869,7 @@ function buildRecentList(){
 
   state.recentApps.forEach(({key, timestamp}) => {
     const app = apps[key];
-    if(!app) return; // in case an app gets removed from `apps` later
+    if(!app) return;
 
     const row = document.createElement("div");
     row.className = "start-recent-item";
@@ -946,8 +902,7 @@ function buildRecentList(){
   });
 }
 
-// Quick toggles, Dark Mode/Sound are real settings shared with the
-// settings panel. Wi-Fi/Bluetooth are purely cosmetic
+// wifi + bluetooth are cosmetic, darkmode + sound are real
 const QUICK_TOGGLES = [
   { key: "wifi", icon: "📶", label: "Wi-Fi" },
   { key: "bluetooth", icon: "🔷", label: "Bluetooth" },
@@ -996,8 +951,7 @@ function buildQuickToggles(){
   syncQuickToggles();
 }
 
-// Keeps the quick-toggle row's ON/OFF labels and active matching state.settings called at
-// startup after any toggle click and whenever the settings panel changes the same setting
+// sync toggle row to state
 function syncQuickToggles(){
   QUICK_TOGGLES.forEach(({key}) => {
     const pill = document.querySelector(`.start-toggle[data-toggle="${key}"]`);
@@ -1009,9 +963,7 @@ function syncQuickToggles(){
   syncSystemTray();
 }
 
-// Mirrors wifi/sound state into the taskbar tray so it's visible even
-// without opening the start menu. Called every time syncQuickToggles()
-// runs since they should never visually disagree
+// mirror toggle state to tray
 function syncSystemTray(){
   const wifiEl = document.getElementById("tray-wifi");
   const soundEl = document.getElementById("tray-sound");
@@ -1019,8 +971,7 @@ function syncSystemTray(){
   if(soundEl) soundEl.textContent = state.settings.sounds ? "🔊" : "🔇";
 }
 
-// If a settings window happen to be open while a quick toggle changes,
-// this keeps that window's own toggle buttons in sync
+// keep open settings panels in sync
 function syncOpenSettingsPanels(){
   state.windows.forEach((win) => {
     if(win.dataset.app === "settings"){
@@ -1034,9 +985,7 @@ buildStartMenu();
 buildRecentList();
 buildQuickToggles();
 
-// Shutdown
-// Pulled into its own function so the terminal's `shutdown` command can
-// trigger the exact same behaviour instead of duplicating it
+// shutdown (also used by terminal)
 function shutdownOS(){
   startMenu.classList.add("hidden");
   document.body.innerHTML = 
@@ -1055,7 +1004,7 @@ document.querySelector('[data-action="shutdown"]')?.addEventListener("keydown", 
 
 document.querySelector('[data-action="shutdown"]')?.addEventListener("click", shutdownOS);
 
-// ----- Apps Folder Wiring 
+// apps folder
 function wireAppsFolder(container){
   container.querySelectorAll(".folder-item[data-app]").forEach((item) => {
     item.addEventListener("dblclick", () => openWindow(item.dataset.app));
@@ -1081,11 +1030,8 @@ function wireAppsFolder(container){
   });
 }
 
-//       Settings Wiring 
+// Settings Wiring 
 function wireSettings(container){
-  // The template's markup always starts at hardcoded defaults (OFF, teal, etc.)
-  // this overwrites that with whatever's actually in state.settings 
-  // which may have come from localStorage
   syncSettingsUI(container);
 
   container.querySelectorAll(".toggle").forEach((btn) => {
@@ -1119,9 +1065,6 @@ function wireSettings(container){
   });
 }
 
-// Makes a freshly opened settings panel match whatever's actually saved 
-// instead of always showing the template's hardcoded starting markup
-
 function syncSettingsUI(container){
   container.querySelectorAll(".toggle").forEach((btn) => {
     const isActive = !!state.settings[btn.dataset.setting];
@@ -1145,7 +1088,6 @@ function wireNotepad(container){
     console.warn("Couldn't load saved notes.", err);
   }
 
-  // Saving on every keystroke is fine
   textarea.addEventListener("input", () => {
     try{
       localStorage.setItem(STORAGE_KEYS.notepad, textarea.value);
@@ -1319,7 +1261,7 @@ function wireBrowser(container){
   goHome();
 }
 
-//   Fortune Cookie Wiring 
+// fortune cookie wiring 
 const FORTUNES = [
   "A closed mouth gathers no foot.",
   "The bug you fear most is the one already fixed.",
@@ -1367,7 +1309,7 @@ function wireFortune(container){
     return FORTUNES[i];
   }
  
-  // Real fortune-cookie slips print 6 unique numbers on the back
+  // 6 unique numbers like a real slip
   function pickLuckyNumbers(){
     const pool = Array.from({length: 49}, (_, i) => i + 1);
     const picked = [];
@@ -1400,8 +1342,7 @@ function wireFortune(container){
       renderSlip();
       requestAnimationFrame(() => slip.classList.add("visible"));
     } else{
-      // brief fade-out/fade-in so a repeat crack still feels like a
-      // fresh slip instead of the numbers just snapping to new ones
+      // fade transition on re-crack
       slip.classList.remove("visible");
       setTimeout(() => {
         renderSlip();
@@ -1422,8 +1363,7 @@ function wireFortune(container){
   againBtn.addEventListener("click", crack);
 }
 
-// Immediate-execution style (like a physical calculator!)
-// Resets fresh every time the window opens
+// immediate execution, like a real calculator
 function wireCalculator(container){
   const valueEl = container.querySelector("#calc-value");
   const subEl = container.querySelector("#calc-sub");
@@ -1433,10 +1373,9 @@ function wireCalculator(container){
   let current = "0";
   let previous = null;
   let operator = null;
-  let overwrite = true; // true means the next digit replaces the display
+  let overwrite = true; // overwrite = next digit replaces display
  
-  // Trims float noise (0.1 + 0.2 shouldn't show 0.30000000000000004)
-  // without permanently truncating legitimately long numbers
+  // kills float noise (0.1 + 0.2 = 0.3 not 0.30000000000000004)
   function formatNum(n){
     return Number(n.toPrecision(12)).toString();
   }
@@ -1534,9 +1473,7 @@ function wireCalculator(container){
   container.querySelector('[data-action="percent"]')?.addEventListener("click", percent);
   container.querySelector('[data-action="equals"]')?.addEventListener("click", equals);
  
-  // Keyboard support, but only while THIS calculator is the focused
-  // window — otherwise typing in the terminal/notepad in another window
-  // would get hijacked by whichever calculator happened to open first
+  // keyboard works only when this calc is focused
   const KEY_OPS = {"+": "+", "-": "−", "*": "×", "/": "÷"};
   function handleKey(e){
     if(!document.body.contains(winEl)){
@@ -1557,10 +1494,7 @@ function wireCalculator(container){
   updateDisplay();
 }
 
-// Controls a global setting (state.settings.mood*) not just this window
-// so it keeps affecting the desktop after the window is closed. same
-// pattern as Settings, just for one specific ambient effect instead of
-// the whole page
+// global setting, survives window close
 
 function wireMoodLamp(container){
   const toggleBtn = container.querySelector("#mood-toggle");
@@ -1612,14 +1546,8 @@ function wireMoodLamp(container){
   syncUI();
 }
 
-//             Terminal 
-// A real shell. Commands like opening apps, pinnning/unpinning, changing
-// settings actually work. Shared logic lives here in TERMINAL_COMMANDS
-// Each open terminal window gets its own output log and command history via
-// the closure variables set up in wireTerminal() below
-
-// Shared by every on/off-style setting command (darkmode, sound, wifi, bluetooth)
-// so the validation/apply/sync logic only exists once
+// terminal
+// shared on/off handler
 function toggleBooleanSetting(key, arg, label = key){
   if(arg !== "on" && arg!== "off") return `Usage: ${label} <on/off>`;
   state.settings[key] = arg === "on";
@@ -1744,9 +1672,6 @@ function wireTerminal(container){
   const input = container.querySelector(".terminal-input");
   if(!output || !input) return;
 
-  // Per-instance meaning if you open two terminal windows
-  // each gets its own history
-
   const history = [];
   let historyIndex = -1;
 
@@ -1779,9 +1704,7 @@ function wireTerminal(container){
     const [cmdRaw, ...args] = trimmed.split(/\s+/);
     const cmd = cmdRaw.toLowerCase();
 
-    // `history` needs the closure-scoped array above so
-    // it's handled here directly instead of living in the shared
-    // TERMINAL_COMMANDS map
+    // history lives in the closure, not TERMINAL_COMMANDS
     
     if(cmd === "history"){
       if(history.length === 0) printLine("No commands yet.");
@@ -1827,9 +1750,7 @@ function wireTerminal(container){
     }
   });
 
-  // CLicking anywhere in the terminal refocuses the input but only if
-  // you're not in the middle of selecting text so copying past output
-  // still works normally!
+  // refocus unless selecting text
   container.addEventListener("click", () => {
     if(window.getSelection().toString() === "") input.focus();
   });
@@ -1838,9 +1759,7 @@ function wireTerminal(container){
   input.focus();
 }
 
-//        Context Menu
-// Generic right-click menu built fresh each time it's shown
-// and torn down on close, can be reused for anything
+// context menu
 
 let activeContextMenu = null;
 
@@ -1866,8 +1785,6 @@ function showContextMenu(x, y, items){
 
   document.body.appendChild(menu);
 
-  // Clamp position so the menu can't render partially off-screen
-  // same idea as the window-dragging bounds clamp just for a smaller box
   const rect = menu.getBoundingClientRect();
   const clampedX = Math.min(x, window.innerWidth - rect.width - 8);
   const clampedY = Math.min(y, window.innerHeight - rect.height - 8);
@@ -1884,10 +1801,7 @@ function closeContextMenu(){
   }
 }
 
-// CLose on a left-click anywhere or Escape. Deliberately NOT closing on every
-// right-click globally, that would also suppress the browser's native context
-// menu in places like the Notepad textarea where I still want the right-click 
-// paste to work normally
+// close on click/esc, not on right-click (let native menu work in textareas)
 
 document.addEventListener("click", closeContextMenu);
 document.addEventListener("keydown", (e) => {

@@ -4,7 +4,7 @@
   --bg-lighter: #2c2519;
   --paper: #ede4d0;
   --text: #ece4d2;
-  --text-dim: #9a8f79;
+  --text-dim: #7d745f;
   --accent: #d1893f;
   --accent-hover: #b8752f;
   --danger: #b8503f;
@@ -938,6 +938,7 @@ html, body{
   font-size: 11px;
   color: var(--text-dim);
   font-family: var(--font-body);
+  text-align: center;
 }
 
 /* Terminal */
@@ -974,7 +975,7 @@ html, body{
 }
 
 .terminal-prompt-inline {
-  color: var(--accent);
+  color: var(--ok);
   margin-right: 6px;
 }
 
